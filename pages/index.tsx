@@ -6,7 +6,7 @@ import styles from "../styles/Home.module.css";
 export default function Home() {
   useEffect(() => {
     // @ts-ignore
-    window.ReactNativeWebView.postMessage("hahaha");
+    // window.ReactNativeWebView.postMessage("hahaha");
   }, []);
   return (
     <div className={styles.container}>
