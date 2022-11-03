@@ -10,17 +10,16 @@ function Character(props: any) {
   const onAssetsLoaded = useCallback(() => {
     const frames = [];
 
-    for (let i = 0; i < 16; i++) {
-      frames.push(PIXI.Texture.from(`male02${i}.png`));
+    for (let i = 0; i < 22; i++) {
+      frames.push(PIXI.Texture.from(`Armature_Walk_00${i}.png`));
     }
-
     setTextures(frames);
   }, []);
 
   useEffect(() => {
-    if (!PIXI.Loader.shared.resources["./sprites/male02.json"]) {
+    if (!PIXI.Loader.shared.resources["./sprites/Armature_Walk_00.json"]) {
       PIXI.Loader.shared
-        .add("./sprites/male02.json", { crossOrigin: "anonymous" })
+        .add("./sprites/Armature_Walk_00.json", { crossOrigin: "anonymous" })
         .load(onAssetsLoaded);
     } else {
       onAssetsLoaded();
@@ -35,6 +34,18 @@ function Character(props: any) {
     }
   }, []);
 
+  const handleMove = useCallback((e) => {
+    console.log(animationRef.current);
+    if (animationRef.current) {
+      animationRef.current.play();
+      animationRef.current.x = animationRef.current.x + 10;
+      animationRef.current.y = animationRef.current.y + 10;
+      // const prevX = e.data?.tiltX;
+      // const prevY = e.data?.tiltY;
+      // animationRef.current.setTransform(prevX + 1, prevY + 1);
+    }
+  }, []);
+
   if (textures.length === 0) {
     return <Text text="loading assets..." />;
   }
@@ -44,8 +55,8 @@ function Character(props: any) {
       position="300,75"
       textures={textures}
       interactive={true}
-      pointerdown={toggleAnimation}
-      animationSpeed={0.6}
+      pointerdown={handleMove}
+      animationSpeed={0.3}
     />
   );
 }

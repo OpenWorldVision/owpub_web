@@ -1,1 +1,334 @@
-{"frames":{"male020.png":{"frame":{"x":0,"y":0,"w":106,"h":233},"rotated":false,"trimmed":false,"spriteSourceSize":{"x":0,"y":0,"w":106,"h":233},"sourceSize":{"w":106,"h":233}},"male021.png":{"frame":{"x":106,"y":0,"w":106,"h":233},"rotated":false,"trimmed":false,"spriteSourceSize":{"x":0,"y":0,"w":106,"h":233},"sourceSize":{"w":106,"h":233}},"male022.png":{"frame":{"x":212,"y":0,"w":106,"h":233},"rotated":false,"trimmed":false,"spriteSourceSize":{"x":0,"y":0,"w":106,"h":233},"sourceSize":{"w":106,"h":233}},"male023.png":{"frame":{"x":318,"y":0,"w":106,"h":233},"rotated":false,"trimmed":false,"spriteSourceSize":{"x":0,"y":0,"w":106,"h":233},"sourceSize":{"w":106,"h":233}},"male024.png":{"frame":{"x":424,"y":0,"w":106,"h":233},"rotated":false,"trimmed":false,"spriteSourceSize":{"x":0,"y":0,"w":106,"h":233},"sourceSize":{"w":106,"h":233}},"male025.png":{"frame":{"x":530,"y":0,"w":106,"h":233},"rotated":false,"trimmed":false,"spriteSourceSize":{"x":0,"y":0,"w":106,"h":233},"sourceSize":{"w":106,"h":233}},"male026.png":{"frame":{"x":636,"y":0,"w":106,"h":233},"rotated":false,"trimmed":false,"spriteSourceSize":{"x":0,"y":0,"w":106,"h":233},"sourceSize":{"w":106,"h":233}},"male027.png":{"frame":{"x":742,"y":0,"w":106,"h":233},"rotated":false,"trimmed":false,"spriteSourceSize":{"x":0,"y":0,"w":106,"h":233},"sourceSize":{"w":106,"h":233}},"male028.png":{"frame":{"x":0,"y":233,"w":106,"h":233},"rotated":false,"trimmed":false,"spriteSourceSize":{"x":0,"y":0,"w":106,"h":233},"sourceSize":{"w":106,"h":233}},"male029.png":{"frame":{"x":106,"y":233,"w":106,"h":233},"rotated":false,"trimmed":false,"spriteSourceSize":{"x":0,"y":0,"w":106,"h":233},"sourceSize":{"w":106,"h":233}},"male0210.png":{"frame":{"x":212,"y":233,"w":106,"h":233},"rotated":false,"trimmed":false,"spriteSourceSize":{"x":0,"y":0,"w":106,"h":233},"sourceSize":{"w":106,"h":233}},"male0211.png":{"frame":{"x":318,"y":233,"w":106,"h":233},"rotated":false,"trimmed":false,"spriteSourceSize":{"x":0,"y":0,"w":106,"h":233},"sourceSize":{"w":106,"h":233}},"male0212.png":{"frame":{"x":424,"y":233,"w":106,"h":233},"rotated":false,"trimmed":false,"spriteSourceSize":{"x":0,"y":0,"w":106,"h":233},"sourceSize":{"w":106,"h":233}},"male0213.png":{"frame":{"x":530,"y":233,"w":106,"h":233},"rotated":false,"trimmed":false,"spriteSourceSize":{"x":0,"y":0,"w":106,"h":233},"sourceSize":{"w":106,"h":233}},"male0214.png":{"frame":{"x":636,"y":233,"w":106,"h":233},"rotated":false,"trimmed":false,"spriteSourceSize":{"x":0,"y":0,"w":106,"h":233},"sourceSize":{"w":106,"h":233}},"male0215.png":{"frame":{"x":742,"y":233,"w":106,"h":233},"rotated":false,"trimmed":false,"spriteSourceSize":{"x":0,"y":0,"w":106,"h":233},"sourceSize":{"w":106,"h":233}}},"meta":{"app":"https://github.com/piskelapp/piskel/","version":"1.0","image":"male02.png","format":"RGBA8888","size":{"w":848,"h":466}}}
+{
+  "frames": {
+    "male020.png": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 106,
+        "h": 233
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 106,
+        "h": 233
+      },
+      "sourceSize": {
+        "w": 106,
+        "h": 233
+      }
+    },
+    "male021.png": {
+      "frame": {
+        "x": 106,
+        "y": 0,
+        "w": 106,
+        "h": 233
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 106,
+        "h": 233
+      },
+      "sourceSize": {
+        "w": 106,
+        "h": 233
+      }
+    },
+    "male022.png": {
+      "frame": {
+        "x": 212,
+        "y": 0,
+        "w": 106,
+        "h": 233
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 106,
+        "h": 233
+      },
+      "sourceSize": {
+        "w": 106,
+        "h": 233
+      }
+    },
+    "male023.png": {
+      "frame": {
+        "x": 318,
+        "y": 0,
+        "w": 106,
+        "h": 233
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 106,
+        "h": 233
+      },
+      "sourceSize": {
+        "w": 106,
+        "h": 233
+      }
+    },
+    "male024.png": {
+      "frame": {
+        "x": 424,
+        "y": 0,
+        "w": 106,
+        "h": 233
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 106,
+        "h": 233
+      },
+      "sourceSize": {
+        "w": 106,
+        "h": 233
+      }
+    },
+    "male025.png": {
+      "frame": {
+        "x": 530,
+        "y": 0,
+        "w": 106,
+        "h": 233
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 106,
+        "h": 233
+      },
+      "sourceSize": {
+        "w": 106,
+        "h": 233
+      }
+    },
+    "male026.png": {
+      "frame": {
+        "x": 636,
+        "y": 0,
+        "w": 106,
+        "h": 233
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 106,
+        "h": 233
+      },
+      "sourceSize": {
+        "w": 106,
+        "h": 233
+      }
+    },
+    "male027.png": {
+      "frame": {
+        "x": 742,
+        "y": 0,
+        "w": 106,
+        "h": 233
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 106,
+        "h": 233
+      },
+      "sourceSize": {
+        "w": 106,
+        "h": 233
+      }
+    },
+    "male028.png": {
+      "frame": {
+        "x": 0,
+        "y": 233,
+        "w": 106,
+        "h": 233
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 106,
+        "h": 233
+      },
+      "sourceSize": {
+        "w": 106,
+        "h": 233
+      }
+    },
+    "male029.png": {
+      "frame": {
+        "x": 106,
+        "y": 233,
+        "w": 106,
+        "h": 233
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 106,
+        "h": 233
+      },
+      "sourceSize": {
+        "w": 106,
+        "h": 233
+      }
+    },
+    "male0210.png": {
+      "frame": {
+        "x": 212,
+        "y": 233,
+        "w": 106,
+        "h": 233
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 106,
+        "h": 233
+      },
+      "sourceSize": {
+        "w": 106,
+        "h": 233
+      }
+    },
+    "male0211.png": {
+      "frame": {
+        "x": 318,
+        "y": 233,
+        "w": 106,
+        "h": 233
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 106,
+        "h": 233
+      },
+      "sourceSize": {
+        "w": 106,
+        "h": 233
+      }
+    },
+    "male0212.png": {
+      "frame": {
+        "x": 424,
+        "y": 233,
+        "w": 106,
+        "h": 233
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 106,
+        "h": 233
+      },
+      "sourceSize": {
+        "w": 106,
+        "h": 233
+      }
+    },
+    "male0213.png": {
+      "frame": {
+        "x": 530,
+        "y": 233,
+        "w": 106,
+        "h": 233
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 106,
+        "h": 233
+      },
+      "sourceSize": {
+        "w": 106,
+        "h": 233
+      }
+    },
+    "male0214.png": {
+      "frame": {
+        "x": 636,
+        "y": 233,
+        "w": 106,
+        "h": 233
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 106,
+        "h": 233
+      },
+      "sourceSize": {
+        "w": 106,
+        "h": 233
+      }
+    },
+    "male0215.png": {
+      "frame": {
+        "x": 742,
+        "y": 233,
+        "w": 106,
+        "h": 233
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 106,
+        "h": 233
+      },
+      "sourceSize": {
+        "w": 106,
+        "h": 233
+      }
+    }
+  },
+  "meta": {
+    "app": "https://github.com/piskelapp/piskel/",
+    "version": "1.0",
+    "image": "male02.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 848,
+      "h": 466
+    }
+  }
+}
