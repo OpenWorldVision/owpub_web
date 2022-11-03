@@ -15,7 +15,7 @@ const MapStage = (props: any) => {
   const stageRef = useRef<any>();
   useEffect(() => {
     if (viewportRef.current) {
-      viewportRef.current.drag().pinch().wheel().decelerate();
+      viewportRef.current.drag().pinch().wheel().decelerate().setZoom(2, true);
     }
   }, []);
 
