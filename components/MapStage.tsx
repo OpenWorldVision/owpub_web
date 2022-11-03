@@ -1,22 +1,28 @@
-import { Container, Stage } from "react-pixi-fiber";
+import { Sprite, Stage } from "react-pixi-fiber";
 import React, { useEffect, useMemo, useRef } from "react";
 // @ts-ignore
-import { Tilemap, useTilemapLoader } from "react-pixi-tilemap";
+import { Tilemap, useTilemapLoader, useCollisions } from "react-pixi-tilemap";
 import Character from "./Character";
-import LayerStage from "./core/LayerStage";
 import { Group } from "@pixi/layers";
-import Layer from "./core/Layer";
 import ViewPort from "./core/ViewPort";
+import { useCallbackRef } from "use-callback-ref";
+import * as PIXI from "pixi.js";
 
 const tilemap = "stages/map.tmx";
+const background = "sprites/backgroundFull.png";
 
 const MapStage = (props: any) => {
-  const map = useTilemapLoader(tilemap);
+  // const map = useTilemapLoader(tilemap);
+
   const viewportRef = useRef<any>();
   const stageRef = useRef<any>();
+  const characterRef = useCallbackRef(null, (ref) =>
+    viewportRef?.current?.follow(ref)
+  );
+
   useEffect(() => {
     if (viewportRef.current) {
-      viewportRef.current.drag().pinch().wheel().decelerate().setZoom(2, true);
+      viewportRef.current.pinch().wheel().decelerate();
     }
   }, []);
 
@@ -33,25 +39,21 @@ const MapStage = (props: any) => {
   const mapGroup = new Group(-1, false);
 
   return (
-    <Stage options={options} ref={stageRef}>
+    <Stage options={options} ref={stageRef} scale={1}>
       <ViewPort
         ref={viewportRef}
-        worldWidth={1600}
-        worldHeight={1200}
+        worldWidth={1470}
+        worldHeight={2100}
         screenWidth={window.innerWidth}
         screenHeight={window.innerHeight}
         interaction={stageRef.current?._app.current.renderer}
       >
-        <LayerStage enableSort>
-          <Layer group={playerGroup} />
-          <Layer group={mapGroup} />
-        </LayerStage>
-        <Container>
-          <Tilemap map={map} />
-        </Container>
-        <Container>
-          <Character />
-        </Container>
+        {/* <Tilemap map={map}>
+          <Character ref={characterRef} />
+        </Tilemap> */}
+        <Sprite texture={PIXI.Texture.from(background)}>
+          <Character ref={characterRef} />
+        </Sprite>
       </ViewPort>
     </Stage>
   );

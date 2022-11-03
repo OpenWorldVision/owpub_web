@@ -1,0 +1,197 @@
+{
+  "frames": {
+    "Armature_Stand_00.png": {
+      "frame": { "x": 0, "y": 0, "w": 125, "h": 374 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 125, "h": 374 },
+      "sourceSize": { "w": 125, "h": 374 },
+      "anchor": { "x": 0, "y": 0 }
+    },
+    "Armature_Stand_01.png": {
+      "frame": { "x": 125, "y": 0, "w": 125, "h": 374 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 125, "h": 374 },
+      "sourceSize": { "w": 125, "h": 374 },
+      "anchor": { "x": 0, "y": 0 }
+    },
+    "Armature_Stand_02.png": {
+      "frame": { "x": 250, "y": 0, "w": 125, "h": 374 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 125, "h": 374 },
+      "sourceSize": { "w": 125, "h": 374 },
+      "anchor": { "x": 0, "y": 0 }
+    },
+    "Armature_Stand_03.png": {
+      "frame": { "x": 375, "y": 0, "w": 125, "h": 374 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 125, "h": 374 },
+      "sourceSize": { "w": 125, "h": 374 },
+      "anchor": { "x": 0, "y": 0 }
+    },
+    "Armature_Stand_04.png": {
+      "frame": { "x": 500, "y": 0, "w": 125, "h": 374 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 125, "h": 374 },
+      "sourceSize": { "w": 125, "h": 374 },
+      "anchor": { "x": 0, "y": 0 }
+    },
+    "Armature_Stand_05.png": {
+      "frame": { "x": 625, "y": 0, "w": 125, "h": 374 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 125, "h": 374 },
+      "sourceSize": { "w": 125, "h": 374 },
+      "anchor": { "x": 0, "y": 0 }
+    },
+    "Armature_Stand_06.png": {
+      "frame": { "x": 750, "y": 0, "w": 125, "h": 374 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 125, "h": 374 },
+      "sourceSize": { "w": 125, "h": 374 },
+      "anchor": { "x": 0, "y": 0 }
+    },
+    "Armature_Stand_07.png": {
+      "frame": { "x": 875, "y": 0, "w": 125, "h": 374 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 125, "h": 374 },
+      "sourceSize": { "w": 125, "h": 374 },
+      "anchor": { "x": 0, "y": 0 }
+    },
+    "Armature_Stand_08.png": {
+      "frame": { "x": 1000, "y": 0, "w": 125, "h": 374 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 125, "h": 374 },
+      "sourceSize": { "w": 125, "h": 374 },
+      "anchor": { "x": 0, "y": 0 }
+    },
+    "Armature_Stand_09.png": {
+      "frame": { "x": 1125, "y": 0, "w": 125, "h": 374 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 125, "h": 374 },
+      "sourceSize": { "w": 125, "h": 374 },
+      "anchor": { "x": 0, "y": 0 }
+    },
+    "Armature_Stand_10.png": {
+      "frame": { "x": 0, "y": 374, "w": 125, "h": 374 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 125, "h": 374 },
+      "sourceSize": { "w": 125, "h": 374 },
+      "anchor": { "x": 0, "y": 0 }
+    },
+    "Armature_Stand_11.png": {
+      "frame": { "x": 125, "y": 374, "w": 125, "h": 374 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 125, "h": 374 },
+      "sourceSize": { "w": 125, "h": 374 },
+      "anchor": { "x": 0, "y": 0 }
+    },
+    "Armature_Stand_12.png": {
+      "frame": { "x": 250, "y": 374, "w": 125, "h": 374 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 125, "h": 374 },
+      "sourceSize": { "w": 125, "h": 374 },
+      "anchor": { "x": 0, "y": 0 }
+    },
+    "Armature_Stand_13.png": {
+      "frame": { "x": 375, "y": 374, "w": 125, "h": 374 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 125, "h": 374 },
+      "sourceSize": { "w": 125, "h": 374 },
+      "anchor": { "x": 0, "y": 0 }
+    },
+    "Armature_Stand_14.png": {
+      "frame": { "x": 500, "y": 374, "w": 125, "h": 374 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 125, "h": 374 },
+      "sourceSize": { "w": 125, "h": 374 },
+      "anchor": { "x": 0, "y": 0 }
+    },
+    "Armature_Stand_15.png": {
+      "frame": { "x": 625, "y": 374, "w": 125, "h": 374 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 125, "h": 374 },
+      "sourceSize": { "w": 125, "h": 374 },
+      "anchor": { "x": 0, "y": 0 }
+    },
+    "Armature_Stand_16.png": {
+      "frame": { "x": 750, "y": 374, "w": 125, "h": 374 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 125, "h": 374 },
+      "sourceSize": { "w": 125, "h": 374 },
+      "anchor": { "x": 0, "y": 0 }
+    },
+    "Armature_Stand_17.png": {
+      "frame": { "x": 875, "y": 374, "w": 125, "h": 374 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 125, "h": 374 },
+      "sourceSize": { "w": 125, "h": 374 },
+      "anchor": { "x": 0, "y": 0 }
+    },
+    "Armature_Stand_18.png": {
+      "frame": { "x": 1000, "y": 374, "w": 125, "h": 374 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 125, "h": 374 },
+      "sourceSize": { "w": 125, "h": 374 },
+      "anchor": { "x": 0, "y": 0 }
+    },
+    "Armature_Stand_19.png": {
+      "frame": { "x": 1125, "y": 374, "w": 125, "h": 374 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 125, "h": 374 },
+      "sourceSize": { "w": 125, "h": 374 },
+      "anchor": { "x": 0, "y": 0 }
+    }
+  },
+  "animations": {
+    "Armature_Stand": [
+      "Armature_Stand_00.png",
+      "Armature_Stand_01.png",
+      "Armature_Stand_02.png",
+      "Armature_Stand_03.png",
+      "Armature_Stand_04.png",
+      "Armature_Stand_05.png",
+      "Armature_Stand_06.png",
+      "Armature_Stand_07.png",
+      "Armature_Stand_08.png",
+      "Armature_Stand_09.png",
+      "Armature_Stand_10.png",
+      "Armature_Stand_11.png",
+      "Armature_Stand_12.png",
+      "Armature_Stand_13.png",
+      "Armature_Stand_14.png",
+      "Armature_Stand_15.png",
+      "Armature_Stand_16.png",
+      "Armature_Stand_17.png",
+      "Armature_Stand_18.png",
+      "Armature_Stand_19.png"
+    ]
+  },
+  "meta": {
+    "app": "https://www.codeandweb.com/texturepacker",
+    "version": "1.0",
+    "image": "male02-stand.png",
+    "format": "RGBA8888",
+    "size": { "w": 1250, "h": 748 },
+    "scale": "1",
+    "smartupdate": "$TexturePacker:SmartUpdate:5888f5058c10340a53c8fb2679ccd7a2:5c281be2c0999e30dc40b1bf87c394f1:062c0f274f8454e5f5f97723ec5ff90b$"
+  }
+}
