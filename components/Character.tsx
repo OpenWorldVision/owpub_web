@@ -15,7 +15,8 @@ type InputType = {
   ArrowUp: boolean;
   ArrowRight: boolean;
 };
-const SPEED = 1;
+const SPEED = 2.5;
+const ANIMATION_SPEED = 0.5;
 
 const ASSETS = [
   {
@@ -191,13 +192,13 @@ function Character(props: any, ref: any) {
   useEffect(() => {
     if (texturesStand.length && textures.length) {
       !animationRef?.current?.playing && animationRef?.current?.play();
-      if (animationRef.current.scale.y !== 0.56) {
-        animationRef.current.scale.y = 0.56;
+      if (animationRef.current.scale.y !== 0.65) {
+        animationRef.current.scale.y = 0.65;
       }
       if (animationRef.current.anchor.x !== 0.5) {
         animationRef.current.anchor.x = 0.5;
       }
-      animationRef.current.scale.x = isFlip ? -0.56 : 0.56;
+      animationRef.current.scale.x = isFlip ? -0.65 : 0.65;
     }
   }, [textures.length, texturesStand.length, isWalking, isFlip]);
 
@@ -233,7 +234,7 @@ function Character(props: any, ref: any) {
       position="300,75"
       textures={isWalking ? textures : texturesStand}
       interactive={true}
-      animationSpeed={SPEED * 0.8}
+      animationSpeed={ANIMATION_SPEED}
       roundPixels={true}
       width={100}
       height={200}
