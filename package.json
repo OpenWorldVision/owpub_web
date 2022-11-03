@@ -12,6 +12,7 @@
     "@inlet/react-pixi": "^6.8.0",
     "@pixi/display": "6.5.8",
     "@pixi/layers": "^1.0.11",
+    "@pixi/tilemap": "^3.2.2",
     "@types/node": "18.11.9",
     "@types/react": "18.0.24",
     "@types/react-dom": "18.0.8",
@@ -25,6 +26,7 @@
     "react-dom": "18.2.0",
     "react-pixi-fiber": "^1.0.4",
     "react-pixi-tilemap": "^2.0.2",
-    "typescript": "4.8.4"
+    "typescript": "4.8.4",
+    "use-callback-ref": "^1.3.0"
   }
 }
