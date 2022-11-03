@@ -1,25 +1,23 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import * as PIXI from "pixi.js";
-import AnimatedSprite from "./AnimatedSprite";
+import AnimatedSprite from "./core/AnimatedSprite";
 import { Text } from "react-pixi-fiber";
 
 function Character(props: any) {
   const [textures, setTextures] = useState<PIXI.Texture[]>([]);
   const animationRef = useRef<any>(null);
 
-  useEffect(() => {
-    function onAssetsLoaded() {
-      const frames = [];
+  const onAssetsLoaded = useCallback(() => {
+    const frames = [];
 
-      for (let i = 0; i < 16; i++) {
-        const val = i < 10 ? `${i}` : i;
-        frames.push(PIXI.Texture.from(`male02${val}.png`));
-      }
-
-      setTextures(frames);
+    for (let i = 0; i < 16; i++) {
+      frames.push(PIXI.Texture.from(`male02${i}.png`));
     }
 
-    //
+    setTextures(frames);
+  }, []);
+
+  useEffect(() => {
     if (!PIXI.Loader.shared.resources["./sprites/male02.json"]) {
       PIXI.Loader.shared
         .add("./sprites/male02.json", { crossOrigin: "anonymous" })

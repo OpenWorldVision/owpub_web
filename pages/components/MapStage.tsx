@@ -2,9 +2,9 @@ import { Container, Stage } from "react-pixi-fiber";
 import React, { useEffect, useMemo, useRef } from "react";
 import { Tilemap, useTilemapLoader } from "react-pixi-tilemap";
 import Character from "./Character";
-import LayerStage from "./LayerStage";
+import LayerStage from "./core/LayerStage";
 import { Group } from "@pixi/layers";
-import Layer from "./Layer";
+import Layer from "./core/Layer";
 import ViewPort from "./core/ViewPort";
 
 const tilemap = "stages/map.tmx";
