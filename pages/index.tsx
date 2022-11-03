@@ -4,7 +4,7 @@ import Image from "next/image";
 import styles from "../styles/Home.module.css";
 
 export default function Home() {
-  const NoSSRMapStage = dynamic(() => import("./components/MapStage"), {
+  const NoSSRMapStage = dynamic(() => import("../components/MapStage"), {
     ssr: false,
   });
 
