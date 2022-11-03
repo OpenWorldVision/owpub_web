@@ -7,14 +7,14 @@ const behavior = {
     stage.sortableChildren = true;
     return stage;
   },
-  customDidAttach: (instance) => {
+  customDidAttach: (instance: any) => {
     const updateStage = () => {
       instance.updateStage();
       instance._updateStageRafId = window.requestAnimationFrame(updateStage);
     };
     updateStage();
   },
-  customWillDetach: (instance) => {
+  customWillDetach: (instance: any) => {
     window.cancelAnimationFrame(instance._updateStageRafId);
     instance.destroy();
   },
