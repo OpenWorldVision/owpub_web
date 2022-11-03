@@ -1,5 +1,6 @@
 import { Container, Stage } from "react-pixi-fiber";
 import React, { useEffect, useMemo, useRef } from "react";
+// @ts-ignore
 import { Tilemap, useTilemapLoader } from "react-pixi-tilemap";
 import Character from "./Character";
 import LayerStage from "./core/LayerStage";
