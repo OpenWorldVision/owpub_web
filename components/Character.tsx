@@ -56,8 +56,12 @@ const ASSETS = [
     numFrameStand: 20,
   },
 ];
-
-function Character(props: any, ref: any) {
+type Props = {
+  defaultPosition: string;
+  onLoadJoyStick: () => void;
+};
+function Character(props: Props, ref: any) {
+  const { defaultPosition, onLoadJoyStick } = props;
   const [textures, setTextures] = useState<PIXI.Texture[]>([]);
   const [texturesStand, setTexturesStand] = useState<PIXI.Texture[]>([]);
 
@@ -154,6 +158,16 @@ function Character(props: any, ref: any) {
       PIXI.Loader.shared.reset();
       PIXI.Loader.shared
         .add(path, { crossOrigin: "anonymous" })
+        .add("./sprites/joystick.png", {
+          crossOrigin: "anonymous",
+        })
+        .add("./sprites/joystick-handle.png", {
+          crossOrigin: "anonymous",
+          onComplete: () => {
+            console.log("Joystick load");
+            return onLoadJoyStick();
+          },
+        })
         .load(onLoadSuccess);
     },
     []
@@ -236,7 +250,7 @@ function Character(props: any, ref: any) {
   return (
     <AnimatedSprite
       ref={animationRef}
-      position="300,75"
+      position={defaultPosition}
       textures={isWalking ? textures : texturesStand}
       interactive={true}
       animationSpeed={ANIMATION_SPEED}
@@ -245,6 +259,8 @@ function Character(props: any, ref: any) {
       height={200}
       loop
       pointerdown={handleClick}
+      x={window.innerHeight * 2}
+      y={window.innerWidth * 1.5}
     />
   );
 }

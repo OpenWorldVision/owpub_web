@@ -1,5 +1,5 @@
-import { Sprite, Stage } from "react-pixi-fiber";
-import React, { useEffect, useMemo, useRef } from "react";
+import { Sprite, Stage, Container } from "react-pixi-fiber";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 // @ts-ignore
 import { Tilemap, useTilemapLoader, useCollisions } from "react-pixi-tilemap";
 import Character from "./Character";
@@ -8,16 +8,21 @@ import ViewPort from "./core/ViewPort";
 import { useCallbackRef } from "use-callback-ref";
 import JoyStickPixi from "./core/JoystickPixi";
 import * as PIXI from "pixi.js";
+import LayerStage from "./core/LayerStage";
+import Layer from "./core/Layer";
+import { WORLD_HEIGHT, WORLD_WIDTH } from "../constants";
 
 const tilemap = "stages/map.tmx";
 const background = "sprites/backgroundFull.png";
 
 const MapStage = (props: any) => {
   // const map = useTilemapLoader(tilemap);
+  const [joystickLoaded, setJoystickLoaded] = useState(false);
 
   const viewportRef = useRef<any>();
   const stageRef = useRef<any>();
-  const characterRef = useCallbackRef(null, (ref) =>
+  const joystickRef = useRef<any>();
+  const characterRef = useCallbackRef(null, (ref: any) =>
     viewportRef?.current?.follow(ref)
   );
 
@@ -25,12 +30,7 @@ const MapStage = (props: any) => {
     if (viewportRef.current) {
       viewportRef.current.pinch().wheel().decelerate();
     }
-    // if (!PIXI.Loader.shared.resources["outer"]) {
-    //   PIXI.Loader.shared
-    //     .add("outer", "./sprites/joystick.png")
-    //     // .add("inner", "./sprites/joystick-handle.png")
-    //     .load();
-    // }
+    console.log(joystickRef.current);
   }, []);
 
   const options = useMemo(
@@ -49,31 +49,31 @@ const MapStage = (props: any) => {
     <Stage options={options} ref={stageRef} scale={1}>
       <ViewPort
         ref={viewportRef}
-        worldWidth={1470}
-        worldHeight={2100}
+        worldWidth={WORLD_WIDTH}
+        worldHeight={WORLD_HEIGHT}
         screenWidth={window.innerWidth}
         screenHeight={window.innerHeight}
         interaction={stageRef.current?._app.current.renderer}
       >
-        {/* <Tilemap map={map}>
-          <Character ref={characterRef} />
-        </Tilemap> */}
-        <Sprite texture={PIXI.Texture.from(background)}>
-          <Character ref={characterRef} />
-        </Sprite>
         <LayerStage enableSort>
           <Layer group={joystickGroup} />
           <Layer group={playerGroup} />
           <Layer group={mapGroup} />
         </LayerStage>
         <Container>
-          <Tilemap map={map} />
+          {joystickLoaded && <JoyStickPixi ref={joystickRef} />}
         </Container>
+        <Container />
         <Container>
-          <Character />
-        </Container>
-        <Container>
-          <JoyStickPixi />
+          <Sprite texture={PIXI.Texture.from(background)}>
+            <Character
+              ref={characterRef}
+              defaultPosition={`${window.innerWidth / 2} ${
+                window.innerHeight / 2
+              }`}
+              onLoadJoyStick={() => setJoystickLoaded(true)}
+            />
+          </Sprite>
         </Container>
       </ViewPort>
     </Stage>
