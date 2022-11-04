@@ -56,59 +56,43 @@ const MapStage = (props: any) => {
     (data: any) => {
       switch (data) {
         case "bottom": {
-          characterRef.current.characterAnimation.y =
-            characterRef.current.characterAnimation.y + 2.5;
-          characterRef?.current?.handleKeyUp("bottom");
-          characterRef?.current?.handleKeyDown("bottom");
+          characterRef.current.y = characterRef.current.y + 2.5;
+
           break;
         }
         case "left": {
-          characterRef.current.characterAnimation.x =
-            characterRef.current.characterAnimation.x - 2.5;
-          characterRef?.current?.handleKeyUp("left");
-          characterRef?.current?.handleKeyDown("left");
+          characterRef.current.x = characterRef.current.x - 2.5;
+
           break;
         }
         case "top": {
-          characterRef.current.characterAnimation.y =
-            characterRef.current.characterAnimation.y - 2.5;
-          characterRef?.current?.handleKeyUp("top");
-          characterRef?.current?.handleKeyDown("top");
+          characterRef.current.y = characterRef.current.y - 2.5;
+
           break;
         }
         case "right": {
-          characterRef.current.characterAnimation.x =
-            characterRef.current.characterAnimation.x + 2.5;
-          characterRef?.current?.handleKeyUp("right");
-          characterRef?.current?.handleKeyDown("right");
+          characterRef.current.x = characterRef.current.x + 2.5;
+
           break;
         }
         case "top_left": {
-          characterRef.current.characterAnimation.y =
-            characterRef.current.characterAnimation.y - 1.25;
-          characterRef.current.characterAnimation.x =
-            characterRef.current.characterAnimation.x - 1.25;
+          characterRef.current.y = characterRef.current.y - 1.25;
+          characterRef.current.x = characterRef.current.x - 1.25;
           break;
         }
         case "top_right": {
-          characterRef.current.characterAnimation.y =
-            characterRef.current.characterAnimation.y - 1.25;
-          characterRef.current.characterAnimation.x =
-            characterRef.current.characterAnimation.x + 1.25;
+          characterRef.current.y = characterRef.current.y - 1.25;
+          characterRef.current.x = characterRef.current.x + 1.25;
           break;
         }
         case "bottom_left": {
-          characterRef.current.characterAnimation.y =
-            characterRef.current.characterAnimation.y + 1.25;
-          characterRef.current.characterAnimation.x =
-            characterRef.current.characterAnimation.x - 1.25;
+          characterRef.current.y = characterRef.current.y + 1.25;
+          characterRef.current.x = characterRef.current.x - 1.25;
           break;
         }
         case "bottom_right": {
-          characterRef.current.characterAnimation.y =
-            characterRef.current.characterAnimation.y + 1.25;
-          characterRef.current.characterAnimation.x =
-            characterRef.current.characterAnimation.x + 1.25;
+          characterRef.current.y = characterRef.current.y + 1.25;
+          characterRef.current.x = characterRef.current.x + 1.25;
           break;
         }
         default: {
