@@ -10,10 +10,10 @@ import * as PIXI from "pixi.js";
 import AnimatedSprite from "./core/AnimatedSprite";
 import { Text, usePixiTicker } from "react-pixi-fiber";
 type InputType = {
-  ArrowLeft: boolean;
-  ArrowDown: boolean;
-  ArrowUp: boolean;
-  ArrowRight: boolean;
+  left: boolean;
+  bottom: boolean;
+  top: boolean;
+  right: boolean;
 };
 const SPEED = 2.5;
 const ANIMATION_SPEED = 0.5;
@@ -56,6 +56,7 @@ const ASSETS = [
     numFrameStand: 20,
   },
 ];
+
 type Props = {
   defaultPosition: string;
   onLoadJoyStick: () => void;
@@ -70,16 +71,16 @@ function Character(props: Props, ref: any) {
 
   const animationRef = useRef<any>(null);
   const keys = useRef<InputType>({
-    ArrowLeft: false,
-    ArrowDown: false,
-    ArrowUp: false,
-    ArrowRight: false,
+    left: false,
+    bottom: false,
+    top: false,
+    right: false,
   });
 
   const onWalking = useCallback((isKeyUp?: boolean) => {
     const arrayKeys = Object.keys(keys?.current);
-    const arrayValues = Object.values(keys?.current);
 
+    const arrayValues = Object.values(keys?.current);
     setIsWorking((prevState) => {
       const indexKey = arrayValues?.findIndex((item) => item);
       const newState = indexKey !== -1;
@@ -92,14 +93,14 @@ function Character(props: Props, ref: any) {
         key,
         isKeyDown: arrayValues[index],
       }));
+
+    console.log("333", parseObjToArray);
     const isRight = !!parseObjToArray?.filter(
-      (item) => item?.isKeyDown && item?.key === "ArrowRight"
+      (item) => item?.isKeyDown && item?.key === "right"
     )?.length;
-
     const isLeft = !!parseObjToArray?.filter(
-      (item) => item?.isKeyDown && item?.key === "ArrowLeft"
+      (item) => item?.isKeyDown && item?.key === "left"
     )?.length;
-
     if (!isKeyUp && (isRight || isLeft)) {
       setIsFlip((prevStateFlip) => {
         if (isRight === prevStateFlip) return prevStateFlip;
@@ -109,13 +110,13 @@ function Character(props: Props, ref: any) {
   }, []);
 
   const handleKeyUp = useCallback(
-    (e: KeyboardEvent) => {
-      switch (e.code) {
-        case "ArrowDown":
-        case "ArrowLeft":
-        case "ArrowUp":
-        case "ArrowRight":
-          keys.current[e.code] = false;
+    (e: string) => {
+      switch (e) {
+        case "bottom":
+        case "left":
+        case "top":
+        case "right":
+          keys.current[e] = false;
           onWalking(true);
           break;
       }
@@ -124,13 +125,13 @@ function Character(props: Props, ref: any) {
   );
 
   const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      switch (e.code) {
-        case "ArrowDown":
-        case "ArrowLeft":
-        case "ArrowUp":
-        case "ArrowRight":
-          keys.current[e.code] = true;
+    (e: string) => {
+      switch (e) {
+        case "bottom":
+        case "left":
+        case "top":
+        case "right":
+          keys.current[e] = true;
           onWalking();
           break;
       }
@@ -158,10 +159,10 @@ function Character(props: Props, ref: any) {
       PIXI.Loader.shared.reset();
       PIXI.Loader.shared
         .add(path, { crossOrigin: "anonymous" })
-        .add("./sprites/joystick.png", {
+        .add("sprites/joystick.png", {
           crossOrigin: "anonymous",
         })
-        .add("./sprites/joystick-handle.png", {
+        .add("sprites/joystick-handle.png", {
           crossOrigin: "anonymous",
           onComplete: () => {
             console.log("Joystick load");
@@ -193,12 +194,12 @@ function Character(props: Props, ref: any) {
         }, 1000);
       }
     );
+    // window.addEventListener("keyup", handleKeyUp);
+    // window.addEventListener("keydown", handleKeyDown);
 
-    window.addEventListener("keyup", handleKeyUp);
-    window.addEventListener("keydown", handleKeyDown);
     return () => {
-      window.removeEventListener("keyup", handleKeyUp);
-      window.removeEventListener("keydown", handleKeyDown);
+      // window.removeEventListener("keyup", handleKeyUp);
+      // window.removeEventListener("keydown", handleKeyDown);
       PIXI.Loader.shared.reset();
     };
   }, []);
@@ -220,23 +221,28 @@ function Character(props: Props, ref: any) {
     if (!animationRef.current) {
       return;
     }
-    if (keys.current.ArrowDown) {
+    if (keys.current.bottom) {
       animationRef.current.y = animationRef.current.y + SPEED;
     }
-    if (keys.current.ArrowLeft) {
+    if (keys.current.left) {
       animationRef.current.x = animationRef.current.x - SPEED;
     }
-    if (keys.current.ArrowUp) {
+    if (keys.current.top) {
       animationRef.current.y = animationRef.current.y - SPEED;
     }
-    if (keys.current.ArrowRight) {
+    if (keys.current.right) {
       animationRef.current.x = animationRef.current.x + SPEED;
     }
   }, []);
 
   usePixiTicker(move);
 
-  useImperativeHandle(ref, () => animationRef.current);
+  useImperativeHandle(ref, () => ({
+    characterAnimation: animationRef.current,
+
+    handleKeyUp,
+    handleKeyDown,
+  }));
 
   const handleClick = useCallback(() => {
     // @ts-ignore

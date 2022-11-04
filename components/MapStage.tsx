@@ -1,5 +1,11 @@
-import { Sprite, Stage, Container } from "react-pixi-fiber";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Sprite, Stage, Container, Text } from "react-pixi-fiber";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 // @ts-ignore
 import { Tilemap, useTilemapLoader, useCollisions } from "react-pixi-tilemap";
 import Character from "./Character";
@@ -28,9 +34,10 @@ const MapStage = (props: any) => {
 
   useEffect(() => {
     if (viewportRef.current) {
+      viewportRef.current.pinch().wheel().decelerate();
       viewportRef.current.pinch().wheel().decelerate().setZoom(0.4);
     }
-    console.log(joystickRef.current);
+    console.log(viewportRef.current.pinch().wheel());
   }, []);
 
   const options = useMemo(
@@ -45,6 +52,73 @@ const MapStage = (props: any) => {
   const playerGroup = new Group(2, false);
   const mapGroup = new Group(-1, false);
 
+  const onRorationJoyStick = useCallback(
+    (data: any) => {
+      switch (data) {
+        case "bottom": {
+          characterRef.current.characterAnimation.y =
+            characterRef.current.characterAnimation.y + 2.5;
+          characterRef?.current?.handleKeyUp("bottom");
+          characterRef?.current?.handleKeyDown("bottom");
+          break;
+        }
+        case "left": {
+          characterRef.current.characterAnimation.x =
+            characterRef.current.characterAnimation.x - 2.5;
+          characterRef?.current?.handleKeyUp("left");
+          characterRef?.current?.handleKeyDown("left");
+          break;
+        }
+        case "top": {
+          characterRef.current.characterAnimation.y =
+            characterRef.current.characterAnimation.y - 2.5;
+          characterRef?.current?.handleKeyUp("top");
+          characterRef?.current?.handleKeyDown("top");
+          break;
+        }
+        case "right": {
+          characterRef.current.characterAnimation.x =
+            characterRef.current.characterAnimation.x + 2.5;
+          characterRef?.current?.handleKeyUp("right");
+          characterRef?.current?.handleKeyDown("right");
+          break;
+        }
+        case "top_left": {
+          characterRef.current.characterAnimation.y =
+            characterRef.current.characterAnimation.y - 1.25;
+          characterRef.current.characterAnimation.x =
+            characterRef.current.characterAnimation.x - 1.25;
+          break;
+        }
+        case "top_right": {
+          characterRef.current.characterAnimation.y =
+            characterRef.current.characterAnimation.y - 1.25;
+          characterRef.current.characterAnimation.x =
+            characterRef.current.characterAnimation.x + 1.25;
+          break;
+        }
+        case "bottom_left": {
+          characterRef.current.characterAnimation.y =
+            characterRef.current.characterAnimation.y + 1.25;
+          characterRef.current.characterAnimation.x =
+            characterRef.current.characterAnimation.x - 1.25;
+          break;
+        }
+        case "bottom_right": {
+          characterRef.current.characterAnimation.y =
+            characterRef.current.characterAnimation.y + 1.25;
+          characterRef.current.characterAnimation.x =
+            characterRef.current.characterAnimation.x + 1.25;
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+    },
+    [characterRef]
+  );
+
   return (
     <Stage options={options} ref={stageRef} scale={1}>
       <ViewPort
@@ -56,24 +130,27 @@ const MapStage = (props: any) => {
         interaction={stageRef.current?._app.current.renderer}
       >
         <LayerStage enableSort>
-          <Layer group={joystickGroup} />
-          <Layer group={playerGroup} />
-          <Layer group={mapGroup} />
+          <Layer group={joystickGroup}>
+            <Container x={window.innerWidth * 1.3} y={window.innerHeight * 1.8}>
+              <JoyStickPixi ref={joystickRef} onRoration={onRorationJoyStick} />
+            </Container>
+          </Layer>
+          <Layer group={playerGroup}></Layer>
+          <Layer group={mapGroup}>
+            <Sprite texture={PIXI.Texture.from(background)}>
+              <Character
+                ref={characterRef}
+                defaultPosition={`${window.innerWidth / 2} ${
+                  window.innerHeight / 2
+                }`}
+                onLoadJoyStick={() => setJoystickLoaded(true)}
+              />
+            </Sprite>
+          </Layer>
         </LayerStage>
+
         <Container>
-          {joystickLoaded && <JoyStickPixi ref={joystickRef} />}
-        </Container>
-        <Container />
-        <Container>
-          <Sprite texture={PIXI.Texture.from(background)}>
-            <Character
-              ref={characterRef}
-              defaultPosition={`${window.innerWidth / 2} ${
-                window.innerHeight / 2
-              }`}
-              onLoadJoyStick={() => setJoystickLoaded(true)}
-            />
-          </Sprite>
+          <Container />
         </Container>
       </ViewPort>
     </Stage>
