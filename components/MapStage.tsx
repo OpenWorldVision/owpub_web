@@ -1,4 +1,10 @@
-import { Sprite, Stage, Container, Text } from "react-pixi-fiber";
+import {
+  Sprite,
+  Stage,
+  Container,
+  Text,
+  usePixiTicker,
+} from "react-pixi-fiber";
 import React, {
   useCallback,
   useEffect,
@@ -16,7 +22,9 @@ import JoyStickPixi from "./core/JoystickPixi";
 import * as PIXI from "pixi.js";
 import LayerStage from "./core/LayerStage";
 import Layer from "./core/Layer";
-import { WORLD_HEIGHT, WORLD_WIDTH } from "../constants";
+import { SPEED, WORLD_HEIGHT, WORLD_WIDTH } from "../constants";
+import { Joystick } from "react-joystick-component";
+import { IJoystickUpdateEvent } from "react-joystick-component/build/lib/Joystick";
 
 const tilemap = "stages/map.tmx";
 const background = "sprites/backgroundFull.png";
@@ -52,47 +60,31 @@ const MapStage = (props: any) => {
   const playerGroup = new Group(2, false);
   const mapGroup = new Group(-1, false);
 
-  const onRorationJoyStick = useCallback(
-    (data: any) => {
-      switch (data) {
-        case "bottom": {
-          characterRef.current.y = characterRef.current.y + 2.5;
+  const handleMove = useCallback(
+    (event: IJoystickUpdateEvent) => {
+      if (!event.direction) {
+        return;
+      }
 
+      switch (event.direction) {
+        case "BACKWARD": {
+          characterRef.current.y = characterRef.current.y + SPEED;
+          characterRef.current.handleKeyDown("bottom");
           break;
         }
-        case "left": {
-          characterRef.current.x = characterRef.current.x - 2.5;
-
+        case "LEFT": {
+          characterRef.current.x = characterRef.current.x - SPEED;
+          characterRef.current.handleKeyDown("left");
           break;
         }
-        case "top": {
-          characterRef.current.y = characterRef.current.y - 2.5;
-
+        case "FORWARD": {
+          characterRef.current.y = characterRef.current.y - SPEED;
+          characterRef.current.handleKeyDown("top");
           break;
         }
-        case "right": {
-          characterRef.current.x = characterRef.current.x + 2.5;
-
-          break;
-        }
-        case "top_left": {
-          characterRef.current.y = characterRef.current.y - 1.25;
-          characterRef.current.x = characterRef.current.x - 1.25;
-          break;
-        }
-        case "top_right": {
-          characterRef.current.y = characterRef.current.y - 1.25;
-          characterRef.current.x = characterRef.current.x + 1.25;
-          break;
-        }
-        case "bottom_left": {
-          characterRef.current.y = characterRef.current.y + 1.25;
-          characterRef.current.x = characterRef.current.x - 1.25;
-          break;
-        }
-        case "bottom_right": {
-          characterRef.current.y = characterRef.current.y + 1.25;
-          characterRef.current.x = characterRef.current.x + 1.25;
+        case "RIGHT": {
+          characterRef.current.x = characterRef.current.x + SPEED;
+          characterRef.current.handleKeyDown("right");
           break;
         }
         default: {
@@ -103,32 +95,59 @@ const MapStage = (props: any) => {
     [characterRef]
   );
 
+  const handleStop = useCallback(() => {
+    characterRef.current?.handleStop();
+  }, [characterRef]);
+
   return (
-    <Stage options={options} ref={stageRef} scale={1}>
-      <ViewPort
-        ref={viewportRef}
-        worldWidth={WORLD_WIDTH}
-        worldHeight={WORLD_HEIGHT}
-        screenWidth={window.innerWidth}
-        screenHeight={window.innerHeight}
-        interaction={stageRef.current?._app.current.renderer}
+    <>
+      <div
+        style={{
+          position: "absolute",
+          bottom: "50px",
+          left: 0,
+          right: 0,
+          marginLeft: "auto",
+          marginRight: "auto",
+          width: "fit-content",
+        }}
       >
-        <LayerStage enableSort>
-          <Layer group={playerGroup}></Layer>
-          <Layer group={mapGroup}>
-            <Sprite texture={PIXI.Texture.from(background)}>
-              <Character
-                ref={characterRef}
-                defaultPosition={`${window.innerWidth / 2} ${
-                  window.innerHeight / 2
-                }`}
-                onLoadJoyStick={() => setJoystickLoaded(true)}
-              />
-            </Sprite>
-          </Layer>
-        </LayerStage>
-      </ViewPort>
-    </Stage>
+        <Joystick
+          size={100}
+          sticky={false}
+          move={handleMove}
+          stop={handleStop}
+          baseImage="./sprites/joystick.png"
+          stickImage="./sprites/joystick-handle.png"
+        />
+      </div>
+
+      <Stage options={options} ref={stageRef} scale={1}>
+        <ViewPort
+          ref={viewportRef}
+          worldWidth={WORLD_WIDTH}
+          worldHeight={WORLD_HEIGHT}
+          screenWidth={window.innerWidth}
+          screenHeight={window.innerHeight}
+          interaction={stageRef.current?._app.current.renderer}
+        >
+          <LayerStage enableSort>
+            <Layer group={playerGroup}></Layer>
+            <Layer group={mapGroup}>
+              <Sprite texture={PIXI.Texture.from(background)}>
+                <Character
+                  ref={characterRef}
+                  defaultPosition={`${window.innerWidth / 2} ${
+                    window.innerHeight / 2
+                  }`}
+                  onLoadJoyStick={() => setJoystickLoaded(true)}
+                />
+              </Sprite>
+            </Layer>
+          </LayerStage>
+        </ViewPort>
+      </Stage>
+    </>
   );
 };
 
