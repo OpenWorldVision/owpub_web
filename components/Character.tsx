@@ -57,7 +57,7 @@ const ASSETS = [
 ];
 
 type Props = {
-  defaultPosition: string;
+  defaultPosition: { x: number; y: number };
   onLoadJoyStick: () => void;
 };
 function Character(props: Props, ref: any) {
@@ -67,7 +67,8 @@ function Character(props: Props, ref: any) {
 
   const [isWalking, setIsWorking] = useState<boolean>(false);
   const [isFlip, setIsFlip] = useState<boolean>(false);
-
+  const joystickRef = useRef<any>();
+  const isSetDefaultPosition = useRef<boolean>(false);
   const animationRef = useRef<any>(null);
   const keys = useRef<InputType>({
     left: false,
@@ -180,6 +181,13 @@ function Character(props: Props, ref: any) {
     []
   );
 
+  const onSetDefaultPosition = useCallback(() => {
+    if (!isSetDefaultPosition.current && animationRef.current) {
+      isSetDefaultPosition.current = true;
+      animationRef.current.position = defaultPosition;
+    }
+  }, [defaultPosition]);
+
   useEffect(() => {
     const asset = ASSETS[Math.floor(Math.random() * ASSETS?.length)];
     onLoadAssets(
@@ -208,6 +216,7 @@ function Character(props: Props, ref: any) {
 
   useEffect(() => {
     if (texturesStand.length && textures.length) {
+      onSetDefaultPosition();
       !animationRef?.current?.playing && animationRef?.current?.play();
       if (animationRef.current.scale.y !== 0.65) {
         animationRef.current.scale.y = 0.65;
@@ -217,7 +226,13 @@ function Character(props: Props, ref: any) {
       }
       animationRef.current.scale.x = isFlip ? -0.65 : 0.65;
     }
-  }, [textures.length, texturesStand.length, isWalking, isFlip]);
+  }, [
+    textures.length,
+    texturesStand.length,
+    isWalking,
+    isFlip,
+    onSetDefaultPosition,
+  ]);
 
   // usePixiTicker(move);
 
@@ -243,7 +258,6 @@ function Character(props: Props, ref: any) {
     <>
       <AnimatedSprite
         ref={animationRef}
-        position={defaultPosition}
         textures={isWalking ? textures : texturesStand}
         interactive={true}
         animationSpeed={ANIMATION_SPEED}
