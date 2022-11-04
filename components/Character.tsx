@@ -224,6 +224,11 @@ function Character(props: any, ref: any) {
 
   useImperativeHandle(ref, () => animationRef.current);
 
+  const handleClick = useCallback(() => {
+    // @ts-ignore
+    window?.ReactNativeWebView?.postMessage("CHAT_ACTION");
+  }, []);
+
   if (texturesStand.length === 0) {
     return <Text text="loading assets..." />;
   }
@@ -239,6 +244,7 @@ function Character(props: any, ref: any) {
       width={100}
       height={200}
       loop
+      pointerdown={handleClick}
     />
   );
 }

@@ -6,6 +6,7 @@ import Character from "./Character";
 import { Group } from "@pixi/layers";
 import ViewPort from "./core/ViewPort";
 import { useCallbackRef } from "use-callback-ref";
+import JoyStickPixi from "./core/JoystickPixi";
 import * as PIXI from "pixi.js";
 
 const tilemap = "stages/map.tmx";
@@ -24,6 +25,12 @@ const MapStage = (props: any) => {
     if (viewportRef.current) {
       viewportRef.current.pinch().wheel().decelerate();
     }
+    // if (!PIXI.Loader.shared.resources["outer"]) {
+    //   PIXI.Loader.shared
+    //     .add("outer", "./sprites/joystick.png")
+    //     // .add("inner", "./sprites/joystick-handle.png")
+    //     .load();
+    // }
   }, []);
 
   const options = useMemo(
@@ -34,7 +41,7 @@ const MapStage = (props: any) => {
     }),
     []
   );
-
+  const joystickGroup = new Group(3, false);
   const playerGroup = new Group(2, false);
   const mapGroup = new Group(-1, false);
 
@@ -54,6 +61,20 @@ const MapStage = (props: any) => {
         <Sprite texture={PIXI.Texture.from(background)}>
           <Character ref={characterRef} />
         </Sprite>
+        <LayerStage enableSort>
+          <Layer group={joystickGroup} />
+          <Layer group={playerGroup} />
+          <Layer group={mapGroup} />
+        </LayerStage>
+        <Container>
+          <Tilemap map={map} />
+        </Container>
+        <Container>
+          <Character />
+        </Container>
+        <Container>
+          <JoyStickPixi />
+        </Container>
       </ViewPort>
     </Stage>
   );
