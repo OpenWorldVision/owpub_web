@@ -237,12 +237,7 @@ function Character(props: Props, ref: any) {
 
   usePixiTicker(move);
 
-  useImperativeHandle(ref, () => ({
-    characterAnimation: animationRef.current,
-
-    handleKeyUp,
-    handleKeyDown,
-  }));
+  useImperativeHandle(ref, () => animationRef.current);
 
   const handleClick = useCallback(() => {
     // @ts-ignore
