@@ -1,5 +1,6 @@
 import React, {
   forwardRef,
+  memo,
   useCallback,
   useEffect,
   useImperativeHandle,
@@ -10,6 +11,9 @@ import * as PIXI from "pixi.js";
 import AnimatedSprite from "./core/AnimatedSprite";
 import { Container, Text, usePixiTicker } from "react-pixi-fiber";
 import JoystickPixi from "./core/JoystickPixi";
+import { Room } from "colyseus.js";
+import { State } from "./state/State";
+
 type InputType = {
   left: boolean;
   bottom: boolean;
@@ -59,11 +63,13 @@ const ASSETS = [
 ];
 
 type Props = {
-  defaultPosition: string;
-  onLoadJoyStick: () => void;
+  defaultPosition?: string;
+  onLoadJoyStick?: () => void;
+  isMine: boolean;
+  room?: Room<State>;
 };
 function Character(props: Props, ref: any) {
-  const { defaultPosition, onLoadJoyStick } = props;
+  const { defaultPosition, onLoadJoyStick, isMine, room } = props;
   const [textures, setTextures] = useState<PIXI.Texture[]>([]);
   const [texturesStand, setTexturesStand] = useState<PIXI.Texture[]>([]);
 
@@ -115,34 +121,35 @@ function Character(props: Props, ref: any) {
     }
   }, []);
 
-  const handleKeyUp = useCallback(
-    (e: string) => {
-      switch (e) {
-        case "bottom":
-        case "left":
-        case "top":
-        case "right":
-          keys.current[e] = false;
-          onWalking(true);
-          break;
-      }
-    },
-    [onWalking]
-  );
+  const handleKeyUp = useCallback((e: string) => {
+    switch (e) {
+      case "bottom":
+      case "left":
+      case "top":
+      case "right":
+        keys.current[e] = false;
+        break;
+    }
+  }, []);
 
-  const handleKeyDown = useCallback(
-    (e: string) => {
-      switch (e) {
-        case "bottom":
-        case "left":
-        case "top":
-        case "right":
-          keys.current[e] = true;
-          onWalking();
-          break;
-      }
+  const handleKeyDown = useCallback((e: string) => {
+    switch (e) {
+      case "bottom":
+      case "left":
+      case "top":
+      case "right":
+        keys.current[e] = true;
+        break;
+    }
+  }, []);
+
+  const onSendEvent = useCallback(
+    (position: any) => {
+      if ((position.x === 0 && position.y === 0) || !isMine || !room) return;
+
+      room?.send("move", position);
     },
-    [onWalking]
+    [isMine, room]
   );
 
   const onLoadAssets = useCallback(
@@ -172,7 +179,7 @@ function Character(props: Props, ref: any) {
           crossOrigin: "anonymous",
           onComplete: () => {
             console.log("Joystick load");
-            return onLoadJoyStick();
+            return onLoadJoyStick?.();
           },
         })
         .load(onLoadSuccess);
@@ -181,7 +188,12 @@ function Character(props: Props, ref: any) {
   );
 
   useEffect(() => {
-    const asset = ASSETS[Math.floor(Math.random() * ASSETS?.length)];
+    let asset: any;
+    // if (window?.bodyId) {
+    //   asset = ASSETS.find((item) => item?.id === window?.bodyId);
+    // } else {
+    asset = ASSETS[Math.floor(Math.random() * ASSETS?.length)];
+    // }
     onLoadAssets(
       asset.pathStand,
       asset.baseNameStand,
@@ -229,27 +241,41 @@ function Character(props: Props, ref: any) {
         return;
       }
       console.log("hahaha", data);
+      let isKeyDown: boolean = true;
+      let position: any = {
+        y: 0,
+        x: 0,
+      };
+
       switch (data) {
         case "bottom": {
           animationRef.current.y = animationRef.current.y + SPEED;
+          position.y = animationRef.current.y;
+          isKeyDown = false;
           handleKeyUp("bottom");
           handleKeyDown("bottom");
           break;
         }
         case "left": {
           animationRef.current.x = animationRef.current.x + SPEED;
+          position.x = animationRef.current.x;
+          isKeyDown = false;
           handleKeyUp("left");
           handleKeyDown("left");
           break;
         }
         case "top": {
           animationRef.current.y = animationRef.current.y - SPEED;
+          position.y = animationRef.current.y;
+          isKeyDown = false;
           handleKeyUp("top");
           handleKeyDown("top");
           break;
         }
         case "right": {
           animationRef.current.x = animationRef.current.x - SPEED;
+          position.x = animationRef.current.x;
+          isKeyDown = false;
           handleKeyUp("right");
           handleKeyDown("right");
           break;
@@ -257,29 +283,43 @@ function Character(props: Props, ref: any) {
         case "top_left": {
           animationRef.current.y = animationRef.current.y - SPEED / 2;
           animationRef.current.x = animationRef.current.x + SPEED / 2;
+          position.x = animationRef.current.x;
+          position.y = animationRef.current.y;
+          isKeyDown = false;
           break;
         }
         case "top_right": {
           animationRef.current.y = animationRef.current.y - SPEED / 2;
           animationRef.current.x = animationRef.current.x - SPEED / 2;
+          position.x = animationRef.current.x;
+          position.y = animationRef.current.y;
+          isKeyDown = false;
           break;
         }
         case "bottom_left": {
           animationRef.current.y = animationRef.current.y + SPEED / 2;
           animationRef.current.x = animationRef.current.x + SPEED / 2;
+          position.x = animationRef.current.x;
+          position.y = animationRef.current.y;
+          isKeyDown = false;
           break;
         }
         case "bottom_right": {
           animationRef.current.y = animationRef.current.y + SPEED / 2;
           animationRef.current.x = animationRef.current.x - SPEED / 2;
+          position.x = animationRef.current.x;
+          position.y = animationRef.current.y;
+          isKeyDown = false;
           break;
         }
         default: {
           break;
         }
       }
+      onWalking(isKeyDown);
+      onSendEvent(position);
     },
-    [handleKeyDown, handleKeyUp]
+    [handleKeyDown, handleKeyUp, onSendEvent, onWalking]
   );
 
   const onEndJoystick = useCallback(() => {
@@ -288,7 +328,7 @@ function Character(props: Props, ref: any) {
 
   // usePixiTicker(move);
 
-  useImperativeHandle(ref, () => animationRef.current);
+  useImperativeHandle(ref, () => ({ ...animationRef.current }));
 
   const handleClick = useCallback(() => {
     // @ts-ignore
