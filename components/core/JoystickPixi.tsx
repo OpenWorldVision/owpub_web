@@ -28,7 +28,7 @@ export default CustomPIXIComponent(
         },
 
         onEnd: () => {
-          console.log("end");
+          props.onEnd();
         },
       });
     },

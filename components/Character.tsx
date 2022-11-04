@@ -8,7 +8,8 @@ import React, {
 } from "react";
 import * as PIXI from "pixi.js";
 import AnimatedSprite from "./core/AnimatedSprite";
-import { Text, usePixiTicker } from "react-pixi-fiber";
+import { Container, Text, usePixiTicker } from "react-pixi-fiber";
+import JoystickPixi from "./core/JoystickPixi";
 type InputType = {
   left: boolean;
   bottom: boolean;
@@ -68,6 +69,9 @@ function Character(props: Props, ref: any) {
 
   const [isWalking, setIsWorking] = useState<boolean>(false);
   const [isFlip, setIsFlip] = useState<boolean>(false);
+  console.log("haha", isWalking);
+
+  const joystickRef = useRef<any>();
 
   const animationRef = useRef<any>(null);
   const keys = useRef<InputType>({
@@ -83,6 +87,7 @@ function Character(props: Props, ref: any) {
     const arrayValues = Object.values(keys?.current);
     setIsWorking((prevState) => {
       const indexKey = arrayValues?.findIndex((item) => item);
+      console.log("222", indexKey);
       const newState = indexKey !== -1;
       if (newState === prevState) return prevState;
       return newState;
@@ -94,7 +99,8 @@ function Character(props: Props, ref: any) {
         isKeyDown: arrayValues[index],
       }));
 
-    console.log("333", parseObjToArray);
+    console.log("3323", parseObjToArray);
+
     const isRight = !!parseObjToArray?.filter(
       (item) => item?.isKeyDown && item?.key === "right"
     )?.length;
@@ -217,25 +223,70 @@ function Character(props: Props, ref: any) {
     }
   }, [textures.length, texturesStand.length, isWalking, isFlip]);
 
-  const move = useCallback(() => {
-    if (!animationRef.current) {
-      return;
-    }
-    if (keys.current.bottom) {
-      animationRef.current.y = animationRef.current.y + SPEED;
-    }
-    if (keys.current.left) {
-      animationRef.current.x = animationRef.current.x - SPEED;
-    }
-    if (keys.current.top) {
-      animationRef.current.y = animationRef.current.y - SPEED;
-    }
-    if (keys.current.right) {
-      animationRef.current.x = animationRef.current.x + SPEED;
-    }
+  const move = useCallback(
+    (data: any) => {
+      if (!animationRef.current) {
+        return;
+      }
+      console.log("hahaha", data);
+      switch (data) {
+        case "bottom": {
+          animationRef.current.y = animationRef.current.y + SPEED;
+          handleKeyUp("bottom");
+          handleKeyDown("bottom");
+          break;
+        }
+        case "left": {
+          animationRef.current.x = animationRef.current.x + SPEED;
+          handleKeyUp("left");
+          handleKeyDown("left");
+          break;
+        }
+        case "top": {
+          animationRef.current.y = animationRef.current.y - SPEED;
+          handleKeyUp("top");
+          handleKeyDown("top");
+          break;
+        }
+        case "right": {
+          animationRef.current.x = animationRef.current.x - SPEED;
+          handleKeyUp("right");
+          handleKeyDown("right");
+          break;
+        }
+        case "top_left": {
+          animationRef.current.y = animationRef.current.y - SPEED / 2;
+          animationRef.current.x = animationRef.current.x + SPEED / 2;
+          break;
+        }
+        case "top_right": {
+          animationRef.current.y = animationRef.current.y - SPEED / 2;
+          animationRef.current.x = animationRef.current.x - SPEED / 2;
+          break;
+        }
+        case "bottom_left": {
+          animationRef.current.y = animationRef.current.y + SPEED / 2;
+          animationRef.current.x = animationRef.current.x + SPEED / 2;
+          break;
+        }
+        case "bottom_right": {
+          animationRef.current.y = animationRef.current.y + SPEED / 2;
+          animationRef.current.x = animationRef.current.x - SPEED / 2;
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+    },
+    [handleKeyDown, handleKeyUp]
+  );
+
+  const onEndJoystick = useCallback(() => {
+    setIsWorking(false);
   }, []);
 
-  usePixiTicker(move);
+  // usePixiTicker(move);
 
   useImperativeHandle(ref, () => animationRef.current);
 
@@ -249,20 +300,30 @@ function Character(props: Props, ref: any) {
   }
 
   return (
-    <AnimatedSprite
-      ref={animationRef}
-      position={defaultPosition}
-      textures={isWalking ? textures : texturesStand}
-      interactive={true}
-      animationSpeed={ANIMATION_SPEED}
-      roundPixels={true}
-      width={100}
-      height={200}
-      loop
-      pointerdown={handleClick}
-      x={window.innerHeight * 2}
-      y={window.innerWidth * 1.5}
-    />
+    <>
+      <AnimatedSprite
+        ref={animationRef}
+        position={defaultPosition}
+        textures={isWalking ? textures : texturesStand}
+        interactive={true}
+        animationSpeed={ANIMATION_SPEED}
+        roundPixels={true}
+        width={100}
+        height={200}
+        loop
+        pointerdown={handleClick}
+        x={window.innerHeight * 2}
+        y={window.innerWidth * 1.5}
+      >
+        <Container x={160} y={480}>
+          <JoystickPixi
+            ref={joystickRef}
+            onRoration={move}
+            onEnd={onEndJoystick}
+          />
+        </Container>
+      </AnimatedSprite>
+    </>
   );
 }
 
