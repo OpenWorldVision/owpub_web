@@ -8,16 +8,14 @@ import React, {
 } from "react";
 import * as PIXI from "pixi.js";
 import AnimatedSprite from "./core/AnimatedSprite";
-import { Container, Text, usePixiTicker } from "react-pixi-fiber";
-import JoystickPixi from "./core/JoystickPixi";
+import { Text } from "react-pixi-fiber";
+import { ANIMATION_SPEED } from "../constants";
 type InputType = {
   left: boolean;
   bottom: boolean;
   top: boolean;
   right: boolean;
 };
-const SPEED = 2.5;
-const ANIMATION_SPEED = 0.5;
 
 const ASSETS = [
   {
@@ -69,10 +67,8 @@ function Character(props: Props, ref: any) {
 
   const [isWalking, setIsWorking] = useState<boolean>(false);
   const [isFlip, setIsFlip] = useState<boolean>(false);
-
   const joystickRef = useRef<any>();
   const isSetDefaultPosition = useRef<boolean>(false);
-
   const animationRef = useRef<any>(null);
   const keys = useRef<InputType>({
     left: false,
@@ -80,6 +76,13 @@ function Character(props: Props, ref: any) {
     top: false,
     right: false,
   });
+
+  const clearKeys = () => {
+    keys.current.bottom = false;
+    keys.current.left = false;
+    keys.current.right = false;
+    keys.current.top = false;
+  };
 
   const onWalking = useCallback((isKeyUp?: boolean) => {
     const arrayKeys = Object.keys(keys?.current);
@@ -109,10 +112,12 @@ function Character(props: Props, ref: any) {
         return isRight;
       });
     }
+    clearKeys();
   }, []);
 
-  const handleKeyUp = useCallback(
+  const handleStop = useCallback(
     (e: string) => {
+      setIsWorking(false);
       switch (e) {
         case "bottom":
         case "left":
@@ -203,12 +208,8 @@ function Character(props: Props, ref: any) {
         }, 1000);
       }
     );
-    // window.addEventListener("keyup", handleKeyUp);
-    // window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      // window.removeEventListener("keyup", handleKeyUp);
-      // window.removeEventListener("keydown", handleKeyDown);
       PIXI.Loader.shared.reset();
     };
   }, []);
@@ -233,75 +234,16 @@ function Character(props: Props, ref: any) {
     onSetDefaultPosition,
   ]);
 
-  const move = useCallback(
-    (data: any) => {
-      if (!animationRef.current) {
-        return;
-      }
-      switch (data) {
-        case "bottom": {
-          animationRef.current.y = animationRef.current.y + SPEED;
-          handleKeyDown("bottom");
-          // handleKeyUp("bottom");
-          break;
-        }
-        case "left": {
-          animationRef.current.x = animationRef.current.x + SPEED;
-          handleKeyDown("left");
-          // handleKeyUp("left");
-          break;
-        }
-        case "top": {
-          animationRef.current.y = animationRef.current.y - SPEED;
-          handleKeyDown("top");
-          // handleKeyUp("top");
-          break;
-        }
-        case "right": {
-          animationRef.current.x = animationRef.current.x - SPEED;
-          handleKeyDown("right");
-          // handleKeyUp("right");
-          break;
-        }
-        case "top_left": {
-          animationRef.current.y = animationRef.current.y - SPEED / 2;
-          animationRef.current.x = animationRef.current.x + SPEED / 2;
-          handleKeyDown("left");
-          break;
-        }
-        case "top_right": {
-          animationRef.current.y = animationRef.current.y - SPEED / 2;
-          animationRef.current.x = animationRef.current.x - SPEED / 2;
-          handleKeyDown("right");
-          break;
-        }
-        case "bottom_left": {
-          animationRef.current.y = animationRef.current.y + SPEED / 2;
-          animationRef.current.x = animationRef.current.x + SPEED / 2;
-          handleKeyDown("left");
-          break;
-        }
-        case "bottom_right": {
-          animationRef.current.y = animationRef.current.y + SPEED / 2;
-          animationRef.current.x = animationRef.current.x - SPEED / 2;
-          handleKeyDown("right");
-          break;
-        }
-        default: {
-          break;
-        }
-      }
-    },
-    [handleKeyDown]
-  );
-
-  const onEndJoystick = useCallback(() => {
-    setIsWorking(false);
-  }, []);
-
   // usePixiTicker(move);
 
-  useImperativeHandle(ref, () => animationRef.current);
+  useImperativeHandle(ref, () => {
+    if (!animationRef.current) {
+      return;
+    }
+    animationRef.current.handleKeyDown = handleKeyDown;
+    animationRef.current.handleStop = handleStop;
+    return animationRef.current;
+  });
 
   const handleClick = useCallback(() => {
     // @ts-ignore
@@ -326,15 +268,7 @@ function Character(props: Props, ref: any) {
         pointerdown={handleClick}
         x={window.innerHeight * 2}
         y={window.innerWidth * 1.5}
-      >
-        <Container x={0} y={480}>
-          <JoystickPixi
-            ref={joystickRef}
-            onRoration={move}
-            onEnd={onEndJoystick}
-          />
-        </Container>
-      </AnimatedSprite>
+      />
     </>
   );
 }
