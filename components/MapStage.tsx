@@ -48,7 +48,7 @@ const MapStage = (props: any) => {
     }),
     []
   );
-  const joystickGroup = new Group(3, false);
+  // const joystickGroup = new Group(3, false);
   const playerGroup = new Group(2, false);
   const mapGroup = new Group(-1, false);
 
@@ -114,11 +114,6 @@ const MapStage = (props: any) => {
         interaction={stageRef.current?._app.current.renderer}
       >
         <LayerStage enableSort>
-          <Layer group={joystickGroup}>
-            <Container x={window.innerWidth * 1.3} y={window.innerHeight * 1.8}>
-              <JoyStickPixi ref={joystickRef} onRoration={onRorationJoyStick} />
-            </Container>
-          </Layer>
           <Layer group={playerGroup}></Layer>
           <Layer group={mapGroup}>
             <Sprite texture={PIXI.Texture.from(background)}>
@@ -132,10 +127,6 @@ const MapStage = (props: any) => {
             </Sprite>
           </Layer>
         </LayerStage>
-
-        <Container>
-          <Container />
-        </Container>
       </ViewPort>
     </Stage>
   );
