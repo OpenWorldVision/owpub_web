@@ -20,6 +20,10 @@ import { WORLD_HEIGHT, WORLD_WIDTH } from "../constants";
 
 const tilemap = "stages/map.tmx";
 const background = "sprites/backgroundFull.png";
+const backgroundSize = {
+  width: 1470 * 2,
+  height: 2100 * 2,
+};
 
 const MapStage = (props: any) => {
   // const map = useTilemapLoader(tilemap);
@@ -48,6 +52,14 @@ const MapStage = (props: any) => {
     }),
     []
   );
+
+  const defaultPosition = useMemo(() => {
+    return {
+      x: backgroundSize.width / 2,
+      y: backgroundSize.height / 3,
+    };
+  }, []);
+
   // const joystickGroup = new Group(3, false);
   const playerGroup = new Group(2, false);
   const mapGroup = new Group(-1, false);
@@ -116,12 +128,10 @@ const MapStage = (props: any) => {
         <LayerStage enableSort>
           <Layer group={playerGroup}></Layer>
           <Layer group={mapGroup}>
-            <Sprite texture={PIXI.Texture.from(background)}>
+            <Sprite texture={PIXI.Texture.from(background)} {...backgroundSize}>
               <Character
                 ref={characterRef}
-                defaultPosition={`${window.innerWidth / 2} ${
-                  window.innerHeight / 2
-                }`}
+                defaultPosition={defaultPosition}
                 onLoadJoyStick={() => setJoystickLoaded(true)}
               />
             </Sprite>
