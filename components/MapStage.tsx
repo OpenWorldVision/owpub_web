@@ -28,7 +28,7 @@ const MapStage = (props: any) => {
 
   useEffect(() => {
     if (viewportRef.current) {
-      viewportRef.current.pinch().wheel().decelerate();
+      viewportRef.current.pinch().wheel().decelerate().setZoom(0.4);
     }
     console.log(joystickRef.current);
   }, []);
