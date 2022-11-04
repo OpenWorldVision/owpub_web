@@ -69,7 +69,6 @@ function Character(props: Props, ref: any) {
 
   const [isWalking, setIsWorking] = useState<boolean>(false);
   const [isFlip, setIsFlip] = useState<boolean>(false);
-  console.log("haha", isWalking);
 
   const joystickRef = useRef<any>();
 
@@ -87,19 +86,15 @@ function Character(props: Props, ref: any) {
     const arrayValues = Object.values(keys?.current);
     setIsWorking((prevState) => {
       const indexKey = arrayValues?.findIndex((item) => item);
-      console.log("222", indexKey);
       const newState = indexKey !== -1;
       if (newState === prevState) return prevState;
       return newState;
     });
-    //
     const parseObjToArray: { key: String; isKeyDown: boolean }[] =
       arrayKeys?.map((key, index) => ({
         key,
         isKeyDown: arrayValues[index],
       }));
-
-    console.log("3323", parseObjToArray);
 
     const isRight = !!parseObjToArray?.filter(
       (item) => item?.isKeyDown && item?.key === "right"
@@ -138,7 +133,7 @@ function Character(props: Props, ref: any) {
         case "top":
         case "right":
           keys.current[e] = true;
-          onWalking();
+          onWalking(false);
           break;
       }
     },
@@ -228,50 +223,53 @@ function Character(props: Props, ref: any) {
       if (!animationRef.current) {
         return;
       }
-      console.log("hahaha", data);
       switch (data) {
         case "bottom": {
           animationRef.current.y = animationRef.current.y + SPEED;
-          handleKeyUp("bottom");
           handleKeyDown("bottom");
+          // handleKeyUp("bottom");
           break;
         }
         case "left": {
           animationRef.current.x = animationRef.current.x + SPEED;
-          handleKeyUp("left");
           handleKeyDown("left");
+          // handleKeyUp("left");
           break;
         }
         case "top": {
           animationRef.current.y = animationRef.current.y - SPEED;
-          handleKeyUp("top");
           handleKeyDown("top");
+          // handleKeyUp("top");
           break;
         }
         case "right": {
           animationRef.current.x = animationRef.current.x - SPEED;
-          handleKeyUp("right");
           handleKeyDown("right");
+          // handleKeyUp("right");
           break;
         }
         case "top_left": {
           animationRef.current.y = animationRef.current.y - SPEED / 2;
           animationRef.current.x = animationRef.current.x + SPEED / 2;
+          handleKeyDown("left");
           break;
         }
         case "top_right": {
           animationRef.current.y = animationRef.current.y - SPEED / 2;
           animationRef.current.x = animationRef.current.x - SPEED / 2;
+          handleKeyDown("right");
           break;
         }
         case "bottom_left": {
           animationRef.current.y = animationRef.current.y + SPEED / 2;
           animationRef.current.x = animationRef.current.x + SPEED / 2;
+          handleKeyDown("left");
           break;
         }
         case "bottom_right": {
           animationRef.current.y = animationRef.current.y + SPEED / 2;
           animationRef.current.x = animationRef.current.x - SPEED / 2;
+          handleKeyDown("right");
           break;
         }
         default: {
@@ -279,7 +277,7 @@ function Character(props: Props, ref: any) {
         }
       }
     },
-    [handleKeyDown, handleKeyUp]
+    [handleKeyDown]
   );
 
   const onEndJoystick = useCallback(() => {
@@ -292,7 +290,7 @@ function Character(props: Props, ref: any) {
 
   const handleClick = useCallback(() => {
     // @ts-ignore
-    window?.ReactNativeWebView?.postMessage("CHAT_ACTION");
+    // window?.ReactNativeWebView?.postMessage("CHAT_ACTION");
   }, []);
 
   if (texturesStand.length === 0) {
