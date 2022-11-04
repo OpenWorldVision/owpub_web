@@ -315,7 +315,7 @@ function Character(props: Props, ref: any) {
         x={window.innerHeight * 2}
         y={window.innerWidth * 1.5}
       >
-        <Container x={160} y={480}>
+        <Container x={0} y={480}>
           <JoystickPixi
             ref={joystickRef}
             onRoration={move}
