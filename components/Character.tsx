@@ -8,8 +8,8 @@ import React, {
 } from "react";
 import * as PIXI from "pixi.js";
 import AnimatedSprite from "./core/AnimatedSprite";
-import { Text } from "react-pixi-fiber";
-import { ANIMATION_SPEED } from "../constants";
+import { Text, usePixiTicker } from "react-pixi-fiber";
+import { ANIMATION_SPEED, SPEED } from "../constants";
 type InputType = {
   left: boolean;
   bottom: boolean;
@@ -58,16 +58,15 @@ const ASSETS = [
 
 type Props = {
   defaultPosition: { x: number; y: number };
-  onLoadJoyStick: () => void;
+  isMine?: boolean;
 };
 function Character(props: Props, ref: any) {
-  const { defaultPosition, onLoadJoyStick } = props;
-  const [textures, setTextures] = useState<PIXI.Texture[]>([]);
+  const { defaultPosition, isMine } = props;
+  const [texturesWalk, setTexturesWalk] = useState<PIXI.Texture[]>([]);
   const [texturesStand, setTexturesStand] = useState<PIXI.Texture[]>([]);
 
   const [isWalking, setIsWorking] = useState<boolean>(false);
   const [isFlip, setIsFlip] = useState<boolean>(false);
-  const joystickRef = useRef<any>();
   const isSetDefaultPosition = useRef<boolean>(false);
   const animationRef = useRef<any>(null);
   const keys = useRef<InputType>({
@@ -77,12 +76,12 @@ function Character(props: Props, ref: any) {
     right: false,
   });
 
-  const clearKeys = () => {
+  const clearKeys = useCallback(() => {
     keys.current.bottom = false;
     keys.current.left = false;
     keys.current.right = false;
     keys.current.top = false;
-  };
+  }, []);
 
   const onWalking = useCallback((isKeyUp?: boolean) => {
     const arrayKeys = Object.keys(keys?.current);
@@ -112,24 +111,13 @@ function Character(props: Props, ref: any) {
         return isRight;
       });
     }
-    clearKeys();
   }, []);
 
-  const handleStop = useCallback(
-    (e: string) => {
-      setIsWorking(false);
-      switch (e) {
-        case "bottom":
-        case "left":
-        case "top":
-        case "right":
-          keys.current[e] = false;
-          onWalking(true);
-          break;
-      }
-    },
-    [onWalking]
-  );
+  const handleStop = useCallback(() => {
+    setIsWorking(false);
+    clearKeys();
+    onWalking(true);
+  }, [clearKeys, onWalking]);
 
   const handleKeyDown = useCallback(
     (e: string) => {
@@ -138,48 +126,46 @@ function Character(props: Props, ref: any) {
         case "left":
         case "top":
         case "right":
+          clearKeys();
           keys.current[e] = true;
           onWalking(false);
           break;
       }
     },
-    [onWalking]
+    [clearKeys, onWalking]
   );
 
-  const onLoadAssets = useCallback(
-    (
-      path: string,
-      baseName: string,
-      numFrame: number,
-      callback: (frames: any) => void
-    ) => {
-      const onLoadSuccess = () => {
-        const frames = [];
-        for (let i = 0; i < numFrame; i++) {
-          frames.push(
-            PIXI.Texture.from(`${baseName}${i < 10 ? `0${i}` : i}.png`)
+  const onLoadAssets = useCallback(() => {
+    const asset = ASSETS[Math.floor(Math.random() * ASSETS?.length)];
+
+    PIXI.Loader.shared
+      .add(asset.pathStand, {
+        crossOrigin: "anonymous",
+      })
+      .add(asset.pathWalk, {
+        crossOrigin: "anonymous",
+      })
+      .load(() => {
+        const framesStand = [];
+        const framesWalk = [];
+        for (let i = 0; i < asset.numFrameStand; i++) {
+          framesStand.push(
+            PIXI.Texture.from(
+              `${asset.baseNameStand}${i < 10 ? `0${i}` : i}.png`
+            )
           );
         }
-        callback && callback(frames);
-      };
-
-      PIXI.Loader.shared.reset();
-      PIXI.Loader.shared
-        .add(path, { crossOrigin: "anonymous" })
-        .add("sprites/joystick.png", {
-          crossOrigin: "anonymous",
-        })
-        .add("sprites/joystick-handle.png", {
-          crossOrigin: "anonymous",
-          onComplete: () => {
-            console.log("Joystick load");
-            return onLoadJoyStick();
-          },
-        })
-        .load(onLoadSuccess);
-    },
-    []
-  );
+        for (let i = 0; i < asset.numFrameWalk; i++) {
+          framesWalk.push(
+            PIXI.Texture.from(
+              `${asset.baseNameWalk}${i < 10 ? `0${i}` : i}.png`
+            )
+          );
+        }
+        setTexturesWalk(framesWalk);
+        setTexturesStand(framesStand);
+      });
+  }, []);
 
   const onSetDefaultPosition = useCallback(() => {
     if (!isSetDefaultPosition.current && animationRef.current) {
@@ -189,25 +175,7 @@ function Character(props: Props, ref: any) {
   }, [defaultPosition]);
 
   useEffect(() => {
-    const asset = ASSETS[Math.floor(Math.random() * ASSETS?.length)];
-    onLoadAssets(
-      asset.pathStand,
-      asset.baseNameStand,
-      asset.numFrameStand,
-      (frames) => {
-        setTimeout(() => {
-          onLoadAssets(
-            asset.pathWalk,
-            asset.baseNameWalk,
-            asset.numFrameWalk,
-            (framesWalk) => {
-              setTextures(framesWalk);
-              setTexturesStand(frames);
-            }
-          );
-        }, 1000);
-      }
-    );
+    onLoadAssets();
 
     return () => {
       PIXI.Loader.shared.reset();
@@ -215,7 +183,7 @@ function Character(props: Props, ref: any) {
   }, []);
 
   useEffect(() => {
-    if (texturesStand.length && textures.length) {
+    if (texturesStand.length && texturesWalk.length) {
       onSetDefaultPosition();
       !animationRef?.current?.playing && animationRef?.current?.play();
       if (animationRef.current.scale.y !== 0.65) {
@@ -227,14 +195,33 @@ function Character(props: Props, ref: any) {
       animationRef.current.scale.x = isFlip ? -0.65 : 0.65;
     }
   }, [
-    textures.length,
+    texturesWalk.length,
     texturesStand.length,
     isWalking,
     isFlip,
     onSetDefaultPosition,
   ]);
 
-  // usePixiTicker(move);
+  const pixiTicker = useCallback((deltaTime: number) => {
+    if (!animationRef.current) {
+      return;
+    }
+
+    if (keys.current.bottom) {
+      animationRef.current.y = animationRef.current.y + SPEED;
+    }
+    if (keys.current.left) {
+      animationRef.current.x = animationRef.current.x - SPEED;
+    }
+    if (keys.current.top) {
+      animationRef.current.y = animationRef.current.y - SPEED;
+    }
+    if (keys.current.right) {
+      animationRef.current.x = animationRef.current.x + SPEED;
+    }
+  }, []);
+
+  usePixiTicker(pixiTicker);
 
   useImperativeHandle(ref, () => {
     if (!animationRef.current) {
@@ -250,7 +237,7 @@ function Character(props: Props, ref: any) {
     // window?.ReactNativeWebView?.postMessage("CHAT_ACTION");
   }, []);
 
-  if (texturesStand.length === 0) {
+  if (texturesStand.length === 0 || texturesWalk.length === 0) {
     return <Text text="loading assets..." />;
   }
 
@@ -258,7 +245,7 @@ function Character(props: Props, ref: any) {
     <>
       <AnimatedSprite
         ref={animationRef}
-        textures={isWalking ? textures : texturesStand}
+        textures={isWalking ? texturesWalk : texturesStand}
         interactive={true}
         animationSpeed={ANIMATION_SPEED}
         roundPixels={true}
