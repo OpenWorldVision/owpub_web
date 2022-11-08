@@ -18,59 +18,83 @@ import { Joystick } from "react-joystick-component";
 import { IJoystickUpdateEvent } from "react-joystick-component/build/lib/Joystick";
 import { Client, Room } from "colyseus.js";
 import { Player, State } from "./state/State";
+import { DataChange } from "@colyseus/schema";
 
 const background = "sprites/backgroundFull.png";
 const backgroundSize = {
   width: 1470 * 2,
   height: 2100 * 2,
 };
-
+let room: Room<State>;
+let mySessionId: string;
 const MapStage = (props: any) => {
   const viewportRef = useRef<any>();
   const stageRef = useRef<any>();
-  const characterRef = useCallbackRef(null, (ref: any) =>
-    viewportRef?.current?.follow(ref)
+  const characterRef = useCallbackRef(
+    null,
+    (ref: any) => ref && viewportRef?.current?.follow(ref)
   );
-  const sectionId = useRef<any>(null);
+  // const sectionId = useRef<any>(null);
 
   const [characters, setCharacters] = useState<any>({});
   const [myCharacter, setMyCharacter] = useState<any>(null);
 
-  const onConnectColyseus = useCallback(async () => {
-    const client: Client = new Client("ws://13.251.125.9:2567/");
-    let room: Room<State> = await client.joinOrCreate<State>("state_handler");
-    sectionId.current = room.sessionId;
-    room.state.players.onAdd = (player: Player, sessionId: string) => {
-      const isMine = sessionId === sectionId.current;
-      let _player: any;
-      let refPlayer: any;
-
-      const callbackRef = (ref: any) => {
-        if (!ref) return;
-        if (isMine) {
-          viewportRef?.current?.follow(ref);
-        } else {
-          refPlayer = ref;
-        }
-      };
+  const onAddCharacter = useCallback(
+    (player: Player, sessionId: string) => {
+      const isMine = sessionId === mySessionId;
 
       if (isMine) {
-        // setMyCharacter();
-        // <Character isMine={isMine} ref={callbackRef} room={room} />
+        setMyCharacter(
+          <Character
+            isMine={isMine}
+            ref={characterRef}
+            defaultPosition={{
+              x: player.x,
+              y: player.y,
+            }}
+            room={room}
+          />
+        );
         return;
       }
 
-      player.onChange = (position) => {
-        const x = position?.find((item) => item?.field === "x");
+      const refCallback = (ref: any) => {
+        player.onChange = (dataChange: DataChange[]) => {
+          const isStop = dataChange?.find((item) => item?.field === "isStop");
+          if (isStop?.value) {
+            ref?.handleStop();
+            return;
+          }
 
-        if (x !== undefined) {
-          // refPlayer.x = x?.value;
-        }
-        const y = position?.find((item) => item?.field === "y");
+          const posX = dataChange?.find((item) => item?.field === "x");
+          const posY = dataChange?.find((item) => item?.field === "y");
 
-        if (y !== undefined) {
-          // refPlayer.y = y?.value;
-        }
+          let direction;
+
+          if (posX) {
+            const changeX = posX?.value - posX?.previousValue;
+            if (changeX > 0) {
+              direction = "right";
+            }
+            if (changeX < 0) {
+              direction = "left";
+            }
+          }
+          if (posY) {
+            const changeY = posY?.value - posY?.previousValue;
+
+            if (changeY > 0) {
+              direction = "bottom";
+            }
+            if (changeY < 0) {
+              direction = "top";
+            }
+          }
+
+          if (direction) {
+            ref?.handleMove(direction);
+          }
+        };
       };
 
       player.onRemove = () => {
@@ -83,23 +107,39 @@ const MapStage = (props: any) => {
         });
       };
 
-      // _player = <Character isMine={isMine} ref={callbackRef} />;
       setCharacters((prev: any) => {
         return {
           ...prev,
-          [sessionId]: _player,
+          [sessionId]: (
+            <Character
+              isMine={isMine}
+              ref={refCallback}
+              defaultPosition={{
+                x: player.x,
+                y: player.y,
+              }}
+            />
+          ),
         };
       });
-    };
-  }, []);
+    },
+    [characterRef]
+  );
+
+  const onConnectColyseus = useCallback(async () => {
+    const client: Client = new Client("ws://localhost:2567");
+    room = await client.joinOrCreate<State>("state_handler");
+    mySessionId = room.sessionId;
+    room.state.players.onAdd = onAddCharacter;
+  }, [onAddCharacter]);
 
   useEffect(() => {
     if (viewportRef.current) {
       viewportRef.current.pinch().wheel().decelerate();
       viewportRef.current.pinch().wheel().decelerate().setZoom(0.4);
     }
-    // onConnectColyseus();
-  }, []);
+    onConnectColyseus();
+  }, [onConnectColyseus]);
 
   const options = useMemo(
     () => ({
@@ -109,13 +149,6 @@ const MapStage = (props: any) => {
     }),
     []
   );
-
-  const defaultPosition = useMemo(() => {
-    return {
-      x: backgroundSize.width / 2,
-      y: backgroundSize.height / 3,
-    };
-  }, []);
 
   // const joystickGroup = new Group(3, false);
   const playerGroup = new Group(2, false);
@@ -129,19 +162,19 @@ const MapStage = (props: any) => {
 
       switch (event.direction) {
         case "BACKWARD": {
-          characterRef.current.handleKeyDown("bottom");
+          characterRef.current.handleMove("bottom");
           break;
         }
         case "LEFT": {
-          characterRef.current.handleKeyDown("left");
+          characterRef.current.handleMove("left");
           break;
         }
         case "FORWARD": {
-          characterRef.current.handleKeyDown("top");
+          characterRef.current.handleMove("top");
           break;
         }
         case "RIGHT": {
-          characterRef.current.handleKeyDown("right");
+          characterRef.current.handleMove("right");
           break;
         }
         default: {
@@ -194,10 +227,8 @@ const MapStage = (props: any) => {
                 texture={PIXI.Texture.from(background)}
                 {...backgroundSize}
               >
-                <Character
-                  ref={characterRef}
-                  defaultPosition={defaultPosition}
-                />
+                {myCharacter}
+                {Object.values(characters)?.map((character: any) => character)}
               </Sprite>
             </Layer>
           </LayerStage>

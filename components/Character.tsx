@@ -10,6 +10,8 @@ import * as PIXI from "pixi.js";
 import AnimatedSprite from "./core/AnimatedSprite";
 import { Text, usePixiTicker } from "react-pixi-fiber";
 import { ANIMATION_SPEED, SPEED } from "../constants";
+import { Room } from "colyseus.js";
+import { State } from "./state/State";
 type InputType = {
   left: boolean;
   bottom: boolean;
@@ -59,16 +61,18 @@ const ASSETS = [
 type Props = {
   defaultPosition: { x: number; y: number };
   isMine?: boolean;
+  room?: Room<State>;
 };
 function Character(props: Props, ref: any) {
-  const { defaultPosition, isMine } = props;
+  const { defaultPosition, isMine, room } = props;
   const [texturesWalk, setTexturesWalk] = useState<PIXI.Texture[]>([]);
   const [texturesStand, setTexturesStand] = useState<PIXI.Texture[]>([]);
 
   const [isWalking, setIsWorking] = useState<boolean>(false);
   const [isFlip, setIsFlip] = useState<boolean>(false);
-  const isSetDefaultPosition = useRef<boolean>(false);
   const animationRef = useRef<any>(null);
+  const isSetDefaultPosition = useRef<boolean>(false);
+  const speedRef = useRef<number>(0);
   const keys = useRef<InputType>({
     left: false,
     bottom: false,
@@ -117,10 +121,18 @@ function Character(props: Props, ref: any) {
     setIsWorking(false);
     clearKeys();
     onWalking(true);
-  }, [clearKeys, onWalking]);
+    if (isMine) {
+      const currentPosition = {
+        x: 0,
+        y: 0,
+        isStop: true,
+      };
+      room?.send("move", currentPosition);
+    }
+  }, [clearKeys, isMine, onWalking, room]);
 
-  const handleKeyDown = useCallback(
-    (e: string) => {
+  const handleMove = useCallback(
+    (e: string, speed: number = SPEED) => {
       switch (e) {
         case "bottom":
         case "left":
@@ -128,6 +140,7 @@ function Character(props: Props, ref: any) {
         case "right":
           clearKeys();
           keys.current[e] = true;
+          speedRef.current = speed;
           onWalking(false);
           break;
       }
@@ -175,12 +188,12 @@ function Character(props: Props, ref: any) {
   }, [defaultPosition]);
 
   useEffect(() => {
+    PIXI.Loader.shared.reset();
     onLoadAssets();
-
     return () => {
       PIXI.Loader.shared.reset();
     };
-  }, []);
+  }, [onLoadAssets]);
 
   useEffect(() => {
     if (texturesStand.length && texturesWalk.length) {
@@ -202,24 +215,40 @@ function Character(props: Props, ref: any) {
     onSetDefaultPosition,
   ]);
 
-  const pixiTicker = useCallback((deltaTime: number) => {
-    if (!animationRef.current) {
-      return;
-    }
+  const pixiTicker = useCallback(
+    (deltaTime: number) => {
+      if (!animationRef.current) {
+        return;
+      }
 
-    if (keys.current.bottom) {
-      animationRef.current.y = animationRef.current.y + SPEED;
-    }
-    if (keys.current.left) {
-      animationRef.current.x = animationRef.current.x - SPEED;
-    }
-    if (keys.current.top) {
-      animationRef.current.y = animationRef.current.y - SPEED;
-    }
-    if (keys.current.right) {
-      animationRef.current.x = animationRef.current.x + SPEED;
-    }
-  }, []);
+      let addPosition = { x: 0, y: 0 };
+
+      if (keys.current.bottom) {
+        addPosition.y = speedRef.current;
+      }
+      if (keys.current.left) {
+        addPosition.x = -speedRef.current;
+      }
+      if (keys.current.top) {
+        addPosition.y = -speedRef.current;
+      }
+      if (keys.current.right) {
+        addPosition.x = speedRef.current;
+      }
+
+      if (addPosition.x !== 0) {
+        animationRef.current.x = animationRef.current.x + addPosition.x;
+      }
+      if (addPosition.y !== 0) {
+        animationRef.current.y = animationRef.current.y + addPosition.y;
+      }
+      const isUpdatePosition = addPosition.x !== 0 || addPosition.y !== 0;
+      if (isMine && isUpdatePosition) {
+        room?.send("move", { ...addPosition, isStop: false });
+      }
+    },
+    [isMine, room]
+  );
 
   usePixiTicker(pixiTicker);
 
@@ -227,7 +256,7 @@ function Character(props: Props, ref: any) {
     if (!animationRef.current) {
       return;
     }
-    animationRef.current.handleKeyDown = handleKeyDown;
+    animationRef.current.handleMove = handleMove;
     animationRef.current.handleStop = handleStop;
     return animationRef.current;
   });
