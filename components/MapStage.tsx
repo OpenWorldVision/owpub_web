@@ -93,11 +93,6 @@ const MapStage = (props: any) => {
             }
           }
 
-          console.log(
-            "\u001B[36m -> file: MapStage.tsx -> line 97 -> direction",
-            direction,
-            isWalking?.value
-          );
           if (direction) {
             ref?.handleMove(direction);
           }
@@ -134,7 +129,7 @@ const MapStage = (props: any) => {
   );
 
   const onConnectColyseus = useCallback(async () => {
-    const client: Client = new Client("ws://localhost:2567");
+    const client: Client = new Client("ws://13.251.125.9:2567/");
     room = await client.joinOrCreate<State>("state_handler");
     mySessionId = room.sessionId;
     room.state.players.onAdd = onAddCharacter;
