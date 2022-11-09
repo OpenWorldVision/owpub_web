@@ -68,7 +68,7 @@ function Character(props: Props, ref: any) {
   const [texturesWalk, setTexturesWalk] = useState<PIXI.Texture[]>([]);
   const [texturesStand, setTexturesStand] = useState<PIXI.Texture[]>([]);
 
-  const [isWalking, setIsWorking] = useState<boolean>(false);
+  const [isWalking, setIsWaking] = useState<boolean>(false);
   const [isFlip, setIsFlip] = useState<boolean>(false);
   const animationRef = useRef<any>(null);
   const isSetDefaultPosition = useRef<boolean>(false);
@@ -91,7 +91,7 @@ function Character(props: Props, ref: any) {
     const arrayKeys = Object.keys(keys?.current);
 
     const arrayValues = Object.values(keys?.current);
-    setIsWorking((prevState) => {
+    setIsWaking((prevState) => {
       const indexKey = arrayValues?.findIndex((item) => item);
       const newState = indexKey !== -1;
       if (newState === prevState) return prevState;
@@ -118,14 +118,14 @@ function Character(props: Props, ref: any) {
   }, []);
 
   const handleStop = useCallback(() => {
-    setIsWorking(false);
+    setIsWaking(false);
     clearKeys();
     onWalking(true);
     if (isMine) {
       const currentPosition = {
         x: 0,
         y: 0,
-        isStop: true,
+        isWalking: false,
       };
       room?.send("move", currentPosition);
     }
@@ -244,7 +244,7 @@ function Character(props: Props, ref: any) {
       }
       const isUpdatePosition = addPosition.x !== 0 || addPosition.y !== 0;
       if (isMine && isUpdatePosition) {
-        room?.send("move", { ...addPosition, isStop: false });
+        room?.send("move", { ...addPosition, isWalking: true });
       }
     },
     [isMine, room]

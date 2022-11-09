@@ -34,7 +34,6 @@ const MapStage = (props: any) => {
     null,
     (ref: any) => ref && viewportRef?.current?.follow(ref)
   );
-  // const sectionId = useRef<any>(null);
 
   const [characters, setCharacters] = useState<any>({});
   const [myCharacter, setMyCharacter] = useState<any>(null);
@@ -60,8 +59,11 @@ const MapStage = (props: any) => {
 
       const refCallback = (ref: any) => {
         player.onChange = (dataChange: DataChange[]) => {
-          const isStop = dataChange?.find((item) => item?.field === "isStop");
-          if (isStop?.value) {
+          const isWalking = dataChange?.find(
+            (item) => item?.field === "isWalking"
+          );
+
+          if (isWalking && !isWalking?.value) {
             ref?.handleStop();
             return;
           }
@@ -91,6 +93,11 @@ const MapStage = (props: any) => {
             }
           }
 
+          console.log(
+            "\u001B[36m -> file: MapStage.tsx -> line 97 -> direction",
+            direction,
+            isWalking?.value
+          );
           if (direction) {
             ref?.handleMove(direction);
           }
