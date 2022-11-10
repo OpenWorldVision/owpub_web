@@ -26,112 +26,86 @@ const backgroundSize = {
   height: 2100 * 2,
 };
 let room: Room<State>;
-let mySessionId: string;
 const MapStage = (props: any) => {
   const viewportRef = useRef<any>();
   const stageRef = useRef<any>();
-  const characterRef = useCallbackRef(
-    null,
-    (ref: any) => ref && viewportRef?.current?.follow(ref)
-  );
 
   const [characters, setCharacters] = useState<any>({});
-  const [myCharacter, setMyCharacter] = useState<any>(null);
 
-  const onAddCharacter = useCallback(
-    (player: Player, sessionId: string) => {
-      const isMine = sessionId === mySessionId;
+  const onAddCharacter = useCallback((player: Player, sessionId: string) => {
+    const refCallback = (ref: any) => {
+      player.onChange = (dataChange: DataChange[]) => {
+        const isWalking = dataChange?.find(
+          (item) => item?.field === "isWalking"
+        );
 
-      if (isMine) {
-        setMyCharacter(
+        if (isWalking && !isWalking?.value) {
+          ref?.handleStop();
+          return;
+        }
+
+        const posX = dataChange?.find((item) => item?.field === "x");
+        const posY = dataChange?.find((item) => item?.field === "y");
+
+        let direction;
+
+        if (posX) {
+          const changeX = posX?.value - posX?.previousValue;
+          if (changeX > 0) {
+            direction = "right";
+          }
+          if (changeX < 0) {
+            direction = "left";
+          }
+        }
+        if (posY) {
+          const changeY = posY?.value - posY?.previousValue;
+
+          if (changeY > 0) {
+            direction = "bottom";
+          }
+          if (changeY < 0) {
+            direction = "top";
+          }
+        }
+
+        if (direction) {
+          ref?.handleMove(direction);
+        }
+      };
+    };
+
+    player.onRemove = () => {
+      setCharacters((prev: any) => {
+        const newState = { ...prev };
+        if (newState[sessionId]) {
+          delete newState[sessionId];
+        }
+        return newState;
+      });
+    };
+
+    setCharacters((prev: any) => {
+      return {
+        ...prev,
+        [sessionId]: (
           <Character
-            isMine={isMine}
-            ref={characterRef}
+            key={sessionId}
+            ref={refCallback}
             defaultPosition={{
               x: player.x,
               y: player.y,
             }}
-            room={room}
           />
-        );
-        return;
-      }
-
-      const refCallback = (ref: any) => {
-        player.onChange = (dataChange: DataChange[]) => {
-          const isWalking = dataChange?.find(
-            (item) => item?.field === "isWalking"
-          );
-
-          if (isWalking && !isWalking?.value) {
-            ref?.handleStop();
-            return;
-          }
-
-          const posX = dataChange?.find((item) => item?.field === "x");
-          const posY = dataChange?.find((item) => item?.field === "y");
-
-          let direction;
-
-          if (posX) {
-            const changeX = posX?.value - posX?.previousValue;
-            if (changeX > 0) {
-              direction = "right";
-            }
-            if (changeX < 0) {
-              direction = "left";
-            }
-          }
-          if (posY) {
-            const changeY = posY?.value - posY?.previousValue;
-
-            if (changeY > 0) {
-              direction = "bottom";
-            }
-            if (changeY < 0) {
-              direction = "top";
-            }
-          }
-
-          if (direction) {
-            ref?.handleMove(direction);
-          }
-        };
+        ),
       };
-
-      player.onRemove = () => {
-        setCharacters((prev: any) => {
-          const newState = { ...prev };
-          if (newState[sessionId]) {
-            delete newState[sessionId];
-          }
-          return newState;
-        });
-      };
-
-      setCharacters((prev: any) => {
-        return {
-          ...prev,
-          [sessionId]: (
-            <Character
-              isMine={isMine}
-              ref={refCallback}
-              defaultPosition={{
-                x: player.x,
-                y: player.y,
-              }}
-            />
-          ),
-        };
-      });
-    },
-    [characterRef]
-  );
+    });
+    // }
+  }, []);
 
   const onConnectColyseus = useCallback(async () => {
-    const client: Client = new Client("ws://13.251.125.9:2567/");
+    const client: Client = new Client("ws://localhost:2567");
     room = await client.joinOrCreate<State>("state_handler");
-    mySessionId = room.sessionId;
     room.state.players.onAdd = onAddCharacter;
   }, [onAddCharacter]);
 
@@ -156,40 +130,42 @@ const MapStage = (props: any) => {
   const playerGroup = new Group(2, false);
   const mapGroup = new Group(-1, false);
 
-  const handleMove = useCallback(
-    (event: IJoystickUpdateEvent) => {
-      if (!event.direction) {
-        return;
-      }
+  const handleMove = useCallback((event: IJoystickUpdateEvent) => {
+    if (!event.direction) {
+      return;
+    }
+    let addPosition = { x: 0, y: 0 };
 
-      switch (event.direction) {
-        case "BACKWARD": {
-          characterRef.current.handleMove("bottom");
-          break;
-        }
-        case "LEFT": {
-          characterRef.current.handleMove("left");
-          break;
-        }
-        case "FORWARD": {
-          characterRef.current.handleMove("top");
-          break;
-        }
-        case "RIGHT": {
-          characterRef.current.handleMove("right");
-          break;
-        }
-        default: {
-          break;
-        }
+    switch (event.direction) {
+      case "BACKWARD": {
+        addPosition.y = 2;
+        break;
       }
-    },
-    [characterRef]
-  );
+      case "LEFT": {
+        addPosition.x = -2;
+        break;
+      }
+      case "FORWARD": {
+        addPosition.y = -2;
+        break;
+      }
+      case "RIGHT": {
+        addPosition.x = 2;
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+    const isUpdatePosition = addPosition.x !== 0 || addPosition.y !== 0;
+    if (isUpdatePosition) {
+      room?.send("move", { ...addPosition, isWalking: true });
+    }
+  }, []);
 
   const handleStop = useCallback(() => {
-    characterRef.current?.handleStop();
-  }, [characterRef]);
+    room?.send("move", { x: 0, y: 0, isWalking: false });
+  }, []);
 
   return (
     <>
@@ -229,7 +205,6 @@ const MapStage = (props: any) => {
                 texture={PIXI.Texture.from(background)}
                 {...backgroundSize}
               >
-                {myCharacter}
                 {Object.values(characters)?.map((character: any) => character)}
               </Sprite>
             </Layer>
