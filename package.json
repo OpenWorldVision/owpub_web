@@ -19,6 +19,7 @@
     "eslint": "8.26.0",
     "eslint-config-next": "13.0.1",
     "next": "13.0.1",
+    "pixi-spine": "^3.1.0",
     "pixi-viewport": "^4.37.0",
     "pixi-virtual-joystick": "^0.4.1",
     "pixi.js": "6.5.8",

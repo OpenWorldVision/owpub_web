@@ -145,13 +145,16 @@ const MapStage = (props: any) => {
           <LayerStage enableSort>
             <Layer group={playerGroup}></Layer>
             <Layer group={mapGroup}>
-             <Sprite texture={PIXI.Texture.from(background)} {...backgroundSize}>
-              <Character
-                ref={characterRef}
-                defaultPosition={defaultPosition}
-                onLoadJoyStick={() => setJoystickLoaded(true)}
-              />
-            </Sprite>
+              <Sprite
+                texture={PIXI.Texture.from(background)}
+                {...backgroundSize}
+              >
+                <Character
+                  ref={characterRef}
+                  defaultPosition={defaultPosition}
+                  onLoadJoyStick={() => setJoystickLoaded(true)}
+                />
+              </Sprite>
             </Layer>
           </LayerStage>
         </ViewPort>

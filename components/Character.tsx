@@ -10,6 +10,9 @@ import * as PIXI from "pixi.js";
 import AnimatedSprite from "./core/AnimatedSprite";
 import { Text } from "react-pixi-fiber";
 import { ANIMATION_SPEED } from "../constants";
+import AnimationSpine from "./core/Spine";
+import { Spine } from "pixi-spine";
+
 type InputType = {
   left: boolean;
   bottom: boolean;
@@ -64,6 +67,8 @@ function Character(props: Props, ref: any) {
   const { defaultPosition, onLoadJoyStick } = props;
   const [textures, setTextures] = useState<PIXI.Texture[]>([]);
   const [texturesStand, setTexturesStand] = useState<PIXI.Texture[]>([]);
+
+  const [animationSpine, setAnimationSpine] = useState(null);
 
   const [isWalking, setIsWorking] = useState<boolean>(false);
   const [isFlip, setIsFlip] = useState<boolean>(false);
@@ -146,40 +151,29 @@ function Character(props: Props, ref: any) {
     [onWalking]
   );
 
-  const onLoadAssets = useCallback(
-    (
-      path: string,
-      baseName: string,
-      numFrame: number,
-      callback: (frames: any) => void
-    ) => {
-      const onLoadSuccess = () => {
-        const frames = [];
-        for (let i = 0; i < numFrame; i++) {
-          frames.push(
-            PIXI.Texture.from(`${baseName}${i < 10 ? `0${i}` : i}.png`)
-          );
-        }
-        callback && callback(frames);
-      };
-
-      PIXI.Loader.shared.reset();
-      PIXI.Loader.shared
-        .add(path, { crossOrigin: "anonymous" })
-        .add("sprites/joystick.png", {
-          crossOrigin: "anonymous",
-        })
-        .add("sprites/joystick-handle.png", {
-          crossOrigin: "anonymous",
-          onComplete: () => {
-            console.log("Joystick load");
-            return onLoadJoyStick();
-          },
-        })
-        .load(onLoadSuccess);
-    },
-    []
-  );
+  const onLoadAssets = useCallback(() => {
+    const app = new PIXI.Application();
+    app.loader
+      .add(
+        "spine",
+        "https://cdn.rawgit.com/macpooh/clipcheck/681433c1/spineboy.json"
+      )
+      .load((loader, resources) => {
+        console.log("resources ne", resources.spine.spineData);
+        setAnimationSpine(resources?.spine.spineData);
+      });
+    // let symbol = new Spine(
+    //   "https://cdn.rawgit.com/macpooh/clipcheck/681433c1/spineboy.json"
+    // );
+    // symbol.scale.set(0.5);
+    // add the container to the stage
+    // center symbol
+    // symbol.position.set(app.view.width / 2, app.view.height / 2);
+    // symbol.lastTime = null;
+    // symbol.skeleton.setToSetupPose();
+    // symbol.state.clearTracks();
+    // symbol.state.addAnimation(0, "idle", true);
+  }, []);
 
   const onSetDefaultPosition = useCallback(() => {
     if (!isSetDefaultPosition.current && animationRef.current) {
@@ -189,26 +183,27 @@ function Character(props: Props, ref: any) {
   }, [defaultPosition]);
 
   useEffect(() => {
-    const asset = ASSETS[Math.floor(Math.random() * ASSETS?.length)];
-    onLoadAssets(
-      asset.pathStand,
-      asset.baseNameStand,
-      asset.numFrameStand,
-      (frames) => {
-        setTimeout(() => {
-          onLoadAssets(
-            asset.pathWalk,
-            asset.baseNameWalk,
-            asset.numFrameWalk,
-            (framesWalk) => {
-              setTextures(framesWalk);
-              setTexturesStand(frames);
-            }
-          );
-        }, 1000);
-      }
-    );
+    // const asset = ASSETS[Math.floor(Math.random() * ASSETS?.length)];
 
+    // onLoadAssets(
+    //   asset.pathStand,
+    //   asset.baseNameStand,
+    //   asset.numFrameStand,
+    //   (frames) => {
+    //     setTimeout(() => {
+    //       onLoadAssets(
+    //         asset.pathWalk,
+    //         asset.baseNameWalk,
+    //         asset.numFrameWalk,
+    //         (framesWalk) => {
+    //           setTextures(framesWalk);
+    //           setTexturesStand(frames);
+    //         }
+    //       );
+    //     }, 1000);
+    //   }
+    // );
+    onLoadAssets();
     return () => {
       PIXI.Loader.shared.reset();
     };
@@ -256,19 +251,7 @@ function Character(props: Props, ref: any) {
 
   return (
     <>
-      <AnimatedSprite
-        ref={animationRef}
-        textures={isWalking ? textures : texturesStand}
-        interactive={true}
-        animationSpeed={ANIMATION_SPEED}
-        roundPixels={true}
-        width={100}
-        height={200}
-        loop
-        pointerdown={handleClick}
-        x={window.innerHeight * 2}
-        y={window.innerWidth * 1.5}
-      />
+      <AnimationSpine path={animationSpine} />
     </>
   );
 }
