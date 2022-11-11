@@ -110,7 +110,7 @@ const MapStage = (props: any) => {
 
   const onConnectColyseus = useCallback(async () => {
     try {
-      const client: Client = new Client("wss://api.openworld.vision:2567");
+      const client: Client = new Client("wss://api.openworld.vision:2568");
       room = await client.joinOrCreate<State>("state_handler");
       mySessionId = room.sessionId;
       room.state.players.onAdd = onAddCharacter;
