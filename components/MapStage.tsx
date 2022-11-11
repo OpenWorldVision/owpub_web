@@ -109,10 +109,14 @@ const MapStage = (props: any) => {
   }, []);
 
   const onConnectColyseus = useCallback(async () => {
-    const client: Client = new Client("wss://api.openworld.vision:2568");
-    room = await client.joinOrCreate<State>("state_handler");
-    mySessionId = room.sessionId;
-    room.state.players.onAdd = onAddCharacter;
+    try {
+      const client: Client = new Client("wss://api.openworld.vision:2568");
+      room = await client.joinOrCreate<State>("state_handler");
+      mySessionId = room.sessionId;
+      room.state.players.onAdd = onAddCharacter;
+    } catch (err) {
+      console.log("\u001B[36m -> file: MapStage.tsx -> line 119 -> err", err);
+    }
   }, [onAddCharacter]);
 
   useEffect(() => {
