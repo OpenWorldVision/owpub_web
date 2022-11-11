@@ -26,14 +26,19 @@ const backgroundSize = {
   height: 2100 * 2,
 };
 let room: Room<State>;
+let mySessionId: string;
+
 const MapStage = (props: any) => {
   const viewportRef = useRef<any>();
   const stageRef = useRef<any>();
 
   const [characters, setCharacters] = useState<any>({});
-
   const onAddCharacter = useCallback((player: Player, sessionId: string) => {
-    const refCallback = (ref: any) => {
+    const isMine = sessionId === mySessionId;
+    const characterRef = (ref: any) => {
+      if (isMine && ref) {
+        viewportRef?.current?.follow(ref);
+      }
       player.onChange = (dataChange: DataChange[]) => {
         const isWalking = dataChange?.find(
           (item) => item?.field === "isWalking"
@@ -91,7 +96,7 @@ const MapStage = (props: any) => {
         [sessionId]: (
           <Character
             key={sessionId}
-            ref={refCallback}
+            ref={characterRef}
             defaultPosition={{
               x: player.x,
               y: player.y,
@@ -104,8 +109,9 @@ const MapStage = (props: any) => {
   }, []);
 
   const onConnectColyseus = useCallback(async () => {
-    const client: Client = new Client("ws://localhost:2567");
+    const client: Client = new Client("wss://api.openworld.vision:2568");
     room = await client.joinOrCreate<State>("state_handler");
+    mySessionId = room.sessionId;
     room.state.players.onAdd = onAddCharacter;
   }, [onAddCharacter]);
 
