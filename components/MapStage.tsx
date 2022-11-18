@@ -98,8 +98,8 @@ const MapStage = (props: any) => {
             key={sessionId}
             ref={characterRef}
             defaultPosition={{
-              x: player.x,
-              y: player.y,
+              x: player.x + WORLD_WIDTH,
+              y: player.y + WORLD_HEIGHT,
             }}
           />
         ),
@@ -122,7 +122,7 @@ const MapStage = (props: any) => {
   useEffect(() => {
     if (viewportRef.current) {
       viewportRef.current.pinch().wheel().decelerate();
-      viewportRef.current.pinch().wheel().decelerate().setZoom(0.4);
+      viewportRef.current.pinch().wheel().decelerate().setZoom(0.3);
     }
     onConnectColyseus();
   }, [onConnectColyseus]);
