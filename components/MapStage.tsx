@@ -1,10 +1,4 @@
-import {
-  Sprite,
-  Stage,
-  Container,
-  Text,
-  usePixiTicker,
-} from "react-pixi-fiber";
+import { Sprite, Stage } from "react-pixi-fiber";
 import React, {
   useCallback,
   useEffect,
@@ -12,45 +6,126 @@ import React, {
   useRef,
   useState,
 } from "react";
-// @ts-ignore
-import { Tilemap, useTilemapLoader, useCollisions } from "react-pixi-tilemap";
 import Character from "./Character";
 import { Group } from "@pixi/layers";
 import ViewPort from "./core/ViewPort";
 import { useCallbackRef } from "use-callback-ref";
-import JoyStickPixi from "./core/JoystickPixi";
 import * as PIXI from "pixi.js";
 import LayerStage from "./core/LayerStage";
 import Layer from "./core/Layer";
-import { SPEED, WORLD_HEIGHT, WORLD_WIDTH } from "../constants";
+import { WORLD_HEIGHT, WORLD_WIDTH } from "../constants";
 import { Joystick } from "react-joystick-component";
 import { IJoystickUpdateEvent } from "react-joystick-component/build/lib/Joystick";
+import { Client, Room } from "colyseus.js";
+import { Player, State } from "./state/State";
+import { DataChange } from "@colyseus/schema";
 
-const tilemap = "stages/map.tmx";
 const background = "sprites/backgroundFull.png";
 const backgroundSize = {
   width: 1470 * 2,
   height: 2100 * 2,
 };
+let room: Room<State>;
+let mySessionId: string;
 
 const MapStage = (props: any) => {
-  // const map = useTilemapLoader(tilemap);
-  const [joystickLoaded, setJoystickLoaded] = useState(false);
-
   const viewportRef = useRef<any>();
   const stageRef = useRef<any>();
-  const joystickRef = useRef<any>();
-  const characterRef = useCallbackRef(null, (ref: any) =>
-    viewportRef?.current?.follow(ref)
-  );
+
+  const [characters, setCharacters] = useState<any>({});
+  const onAddCharacter = useCallback((player: Player, sessionId: string) => {
+    const isMine = sessionId === mySessionId;
+    const characterRef = (ref: any) => {
+      if (isMine && ref) {
+        viewportRef?.current?.follow(ref);
+      }
+      player.onChange = (dataChange: DataChange[]) => {
+        const isWalking = dataChange?.find(
+          (item) => item?.field === "isWalking"
+        );
+
+        if (isWalking && !isWalking?.value) {
+          ref?.handleStop();
+          return;
+        }
+
+        const posX = dataChange?.find((item) => item?.field === "x");
+        const posY = dataChange?.find((item) => item?.field === "y");
+
+        let direction;
+
+        if (posX) {
+          const changeX = posX?.value - posX?.previousValue;
+          if (changeX > 0) {
+            direction = "right";
+          }
+          if (changeX < 0) {
+            direction = "left";
+          }
+        }
+        if (posY) {
+          const changeY = posY?.value - posY?.previousValue;
+
+          if (changeY > 0) {
+            direction = "bottom";
+          }
+          if (changeY < 0) {
+            direction = "top";
+          }
+        }
+
+        if (direction) {
+          ref?.handleMove(direction);
+        }
+      };
+    };
+
+    player.onRemove = () => {
+      setCharacters((prev: any) => {
+        const newState = { ...prev };
+        if (newState[sessionId]) {
+          delete newState[sessionId];
+        }
+        return newState;
+      });
+    };
+
+    setCharacters((prev: any) => {
+      return {
+        ...prev,
+        [sessionId]: (
+          <Character
+            key={sessionId}
+            ref={characterRef}
+            defaultPosition={{
+              x: player.x + WORLD_WIDTH,
+              y: player.y + WORLD_HEIGHT,
+            }}
+          />
+        ),
+      };
+    });
+    // }
+  }, []);
+
+  const onConnectColyseus = useCallback(async () => {
+    try {
+      const client: Client = new Client("wss://api.openworld.vision:2568");
+      room = await client.joinOrCreate<State>("state_handler");
+      mySessionId = room.sessionId;
+      room.state.players.onAdd = onAddCharacter;
+    } catch (err) {
+      console.log("\u001B[36m -> file: MapStage.tsx -> line 119 -> err", err);
+    }
+  }, [onAddCharacter]);
 
   useEffect(() => {
     if (viewportRef.current) {
       viewportRef.current.pinch().wheel().decelerate();
-      viewportRef.current.pinch().wheel().decelerate().setZoom(0.4);
+      viewportRef.current.pinch().wheel().decelerate().setZoom(0.3);
     }
-    console.log(viewportRef.current.pinch().wheel());
-  }, []);
+    onConnectColyseus();
+  }, [onConnectColyseus]);
 
   const options = useMemo(
     () => ({
@@ -61,55 +136,46 @@ const MapStage = (props: any) => {
     []
   );
 
-  const defaultPosition = useMemo(() => {
-    return {
-      x: backgroundSize.width / 2,
-      y: backgroundSize.height / 3,
-    };
-  }, []);
-
   // const joystickGroup = new Group(3, false);
   const playerGroup = new Group(2, false);
   const mapGroup = new Group(-1, false);
 
-  const handleMove = useCallback(
-    (event: IJoystickUpdateEvent) => {
-      if (!event.direction) {
-        return;
-      }
+  const handleMove = useCallback((event: IJoystickUpdateEvent) => {
+    if (!event.direction) {
+      return;
+    }
+    let addPosition = { x: 0, y: 0 };
 
-      switch (event.direction) {
-        case "BACKWARD": {
-          characterRef.current.y = characterRef.current.y + SPEED;
-          characterRef.current.handleKeyDown("bottom");
-          break;
-        }
-        case "LEFT": {
-          characterRef.current.x = characterRef.current.x - SPEED;
-          characterRef.current.handleKeyDown("left");
-          break;
-        }
-        case "FORWARD": {
-          characterRef.current.y = characterRef.current.y - SPEED;
-          characterRef.current.handleKeyDown("top");
-          break;
-        }
-        case "RIGHT": {
-          characterRef.current.x = characterRef.current.x + SPEED;
-          characterRef.current.handleKeyDown("right");
-          break;
-        }
-        default: {
-          break;
-        }
+    switch (event.direction) {
+      case "BACKWARD": {
+        addPosition.y = 2;
+        break;
       }
-    },
-    [characterRef]
-  );
+      case "LEFT": {
+        addPosition.x = -2;
+        break;
+      }
+      case "FORWARD": {
+        addPosition.y = -2;
+        break;
+      }
+      case "RIGHT": {
+        addPosition.x = 2;
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+    const isUpdatePosition = addPosition.x !== 0 || addPosition.y !== 0;
+    if (isUpdatePosition) {
+      room?.send("move", { ...addPosition, isWalking: true });
+    }
+  }, []);
 
   const handleStop = useCallback(() => {
-    characterRef.current?.handleStop();
-  }, [characterRef]);
+    room?.send("move", { x: 0, y: 0, isWalking: false });
+  }, []);
 
   return (
     <>
@@ -145,13 +211,12 @@ const MapStage = (props: any) => {
           <LayerStage enableSort>
             <Layer group={playerGroup}></Layer>
             <Layer group={mapGroup}>
-             <Sprite texture={PIXI.Texture.from(background)} {...backgroundSize}>
-              <Character
-                ref={characterRef}
-                defaultPosition={defaultPosition}
-                onLoadJoyStick={() => setJoystickLoaded(true)}
-              />
-            </Sprite>
+              <Sprite
+                texture={PIXI.Texture.from(background)}
+                {...backgroundSize}
+              >
+                {Object.values(characters)?.map((character: any) => character)}
+              </Sprite>
             </Layer>
           </LayerStage>
         </ViewPort>
